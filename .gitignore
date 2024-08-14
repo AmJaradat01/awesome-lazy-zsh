@@ -1,3 +1,4 @@
 /node_modules
 *.sh
 .zshrc
+.DS_Store
