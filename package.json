@@ -1,0 +1,19 @@
+{
+  "name": "awesome-lazy-zsh",
+  "version": "1.0.0",
+  "description": "Awesome-Lazy-Zsh is an all-in-one, customizable Zsh setup tool designed to enhance your terminal experience.",
+  "main": "awesome-lazy-zsh.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "zsh"
+  ],
+  "author": "Ali M. Jaradat <AmJaradat01@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.4",
+    "cheerio": "^1.0.0",
+    "prompts": "^2.4.2"
+  }
+}
