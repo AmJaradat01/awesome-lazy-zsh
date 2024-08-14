@@ -1,9 +1,10 @@
 const prompts = require('prompts');
 const { execSync } = require('child_process');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const fs = require('fs');
 const os = require('os');
 
-// Helper function to run shell commands
 function runCommand(command) {
     try {
         console.log(`Running: ${command}`);
@@ -13,8 +14,22 @@ function runCommand(command) {
     }
 }
 
+async function fetchOptionsFromWiki(url) {
+    try {
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+        return $('a[href*="/ohmyzsh/ohmyzsh/tree/master/"]')
+            .map((i, el) => $(el).text().trim())
+            .get()
+            .filter((value, index, self) => self.indexOf(value) === index)
+            .sort();
+    } catch (error) {
+        console.error('Failed to fetch data from the Oh My Zsh wiki:', error);
+        return [];
+    }
+}
+
 (async () => {
-    // Step 1: Choose Installation Type
     const { installationType } = await prompts({
         type: 'select',
         name: 'installationType',
@@ -28,66 +43,68 @@ function runCommand(command) {
     let plugins, theme, aliases, functions;
 
     if (installationType === 'default') {
-        // Default Installation
         plugins = ['git', 'npm', 'vscode', 'zsh-autosuggestions', 'zsh-syntax-highlighting', 'docker', 'kubectl', 'terraform', 'fzf', 'z', 'thefuck'];
         theme = 'robbyrussell';
         aliases = 'default';
         functions = 'default';
         runCommand('brew tap homebrew/cask-fonts && brew install --cask font-meslo-lg-nerd-font');
     } else {
-        // Custom Installation
-        // Step 2: Select Theme
-        const { selectedTheme } = await prompts({
+        const builtInThemes = ['Powerlevel10k', 'Agnoster', 'Spaceship', 'Robbyrussell', 'Find more...'];
+        let selectedTheme = await prompts({
             type: 'select',
             name: 'selectedTheme',
             message: 'Select a theme:',
-            choices: [
-                { title: 'Powerlevel10k', value: 'powerlevel10k' },
-                { title: 'Agnoster', value: 'agnoster' },
-                { title: 'Spaceship', value: 'spaceship' },
-                { title: 'Robbyrussell', value: 'robbyrussell' }
-            ]
+            choices: builtInThemes.map((theme) => ({ title: theme, value: theme }))
         });
-        theme = selectedTheme;
 
-        if (theme === 'powerlevel10k') {
+        if (selectedTheme.selectedTheme === 'Find more...') {
+            const additionalThemes = await fetchOptionsFromWiki('https://github.com/ohmyzsh/ohmyzsh/wiki/Themes');
+            selectedTheme = await prompts({
+                type: 'autocompleteMultiselect',
+                name: 'selectedTheme',
+                message: 'Select additional themes:',
+                choices: additionalThemes.map((theme) => ({ title: theme, value: theme }))
+            });
+            theme = selectedTheme.selectedTheme;
+        } else {
+            theme = selectedTheme.selectedTheme.toLowerCase();
+        }
+
+        if (theme.includes('powerlevel10k')) {
             runCommand('git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k');
             runCommand('brew install --cask font-hack-nerd-font');
-        } else if (theme === 'agnoster') {
+        } else if (theme.includes('agnoster')) {
             runCommand('brew install --cask font-meslo-lg-nerd-font');
-        } else if (theme === 'spaceship') {
+        } else if (theme.includes('spaceship')) {
             runCommand('git clone --depth=1 https://github.com/spaceship-prompt/spaceship-prompt.git ~/.oh-my-zsh/custom/themes/spaceship');
             runCommand('brew install --cask font-firacode-nerd-font');
         }
 
-        // Step 3: Select Plugins
-        const { selectedPlugins } = await prompts({
-            type: 'multiselect',
+        const builtInPlugins = [
+            'git', 'npm', 'vscode', 'zsh-autosuggestions', 'zsh-syntax-highlighting',
+            'docker', 'kubectl', 'terraform', 'fzf', 'z', 'thefuck', 'Find more...'
+        ];
+        let selectedPlugins = await prompts({
+            type: 'autocompleteMultiselect',
             name: 'selectedPlugins',
             message: 'Select plugins:',
-            choices: [
-                { title: 'git', value: 'git' },
-                { title: 'npm', value: 'npm' },
-                { title: 'vscode', value: 'vscode' },
-                { title: 'zsh-autosuggestions', value: 'zsh-autosuggestions' },
-                { title: 'zsh-syntax-highlighting', value: 'zsh-syntax-highlighting' },
-                { title: 'docker', value: 'docker' },
-                { title: 'kubectl', value: 'kubectl' },
-                { title: 'terraform', value: 'terraform' },
-                { title: 'fzf', value: 'fzf' },
-                { title: 'z', value: 'z' },
-                { title: 'thefuck', value: 'thefuck' },
-                { title: 'zsh-history-substring-search', value: 'zsh-history-substring-search' },
-                { title: 'zsh-completions', value: 'zsh-completions' },
-                { title: 'zsh-vi-mode', value: 'zsh-vi-mode' }
-            ],
-            instructions: false,
-            min: 1
+            choices: builtInPlugins.map((plugin) => ({ title: plugin, value: plugin }))
         });
-        plugins = selectedPlugins;
 
-        // Step 4: Select Aliases
-        const { aliasChoice } = await prompts({
+        if (selectedPlugins.selectedPlugins.includes('Find more...')) {
+            const additionalPlugins = await fetchOptionsFromWiki('https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins');
+            selectedPlugins = await prompts({
+                type: 'autocompleteMultiselect',
+                name: 'selectedPlugins',
+                message: 'Select additional plugins:',
+                choices: additionalPlugins.map((plugin) => ({ title: plugin, value: plugin }))
+            });
+            plugins = selectedPlugins.selectedPlugins;
+        } else {
+            plugins = selectedPlugins.selectedPlugins;
+        }
+
+        const aliasChoice = await prompts({
             type: 'select',
             name: 'aliasChoice',
             message: 'Choose alias setup:',
@@ -96,10 +113,9 @@ function runCommand(command) {
                 { title: 'Custom Aliases', value: 'custom' }
             ]
         });
-        aliases = aliasChoice;
+        aliases = aliasChoice.aliasChoice;
 
-        // Step 5: Select Functions
-        const { functionChoice } = await prompts({
+        const functionChoice = await prompts({
             type: 'select',
             name: 'functionChoice',
             message: 'Choose function setup:',
@@ -108,10 +124,9 @@ function runCommand(command) {
                 { title: 'Custom Functions', value: 'custom' }
             ]
         });
-        functions = functionChoice;
+        functions = functionChoice.functionChoice;
     }
 
-    // Generate .zshrc based on selections
     const zshrcContent = `
 # ==============================
 #   Oh-My-Zsh Configuration
@@ -177,7 +192,6 @@ mkcd() { mkdir -p "\$1" && cd "\$1" }
 `}
     `;
 
-    // Write the .zshrc file
     fs.writeFileSync(`${os.homedir()}/.zshrc`, zshrcContent.trim());
 
     console.log('Zsh configuration has been updated. Please restart your terminal.');
