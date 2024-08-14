@@ -4,6 +4,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const os = require('os');
+const path = require('path');
 
 // Helper function to run shell commands
 function runCommand(command) {
@@ -62,7 +63,7 @@ async function fetchOptionsFromWiki(url) {
             message: 'Select a theme:',
             choices: builtInThemes.map((theme) => ({ title: theme, value: theme }))
         });
-
+        
         if (selectedTheme.selectedTheme === 'Find more...') {
             const additionalThemes = await fetchOptionsFromWiki('https://github.com/ohmyzsh/ohmyzsh/wiki/Themes');
             selectedTheme = await prompts({
@@ -97,7 +98,7 @@ async function fetchOptionsFromWiki(url) {
             message: 'Select plugins:',
             choices: builtInPlugins.map((plugin) => ({ title: plugin, value: plugin }))
         });
-
+        
         if (selectedPlugins.selectedPlugins.includes('Find more...')) {
             const additionalPlugins = await fetchOptionsFromWiki('https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins');
             selectedPlugins = await prompts({
@@ -202,8 +203,9 @@ mkcd() { mkdir -p "\$1" && cd "\$1" }
 `}
     `;
 
-    // Write the .zshrc file
-    fs.writeFileSync(`${os.homedir()}/.zshrc`, zshrcContent.trim());
+    // Write the .zshrc file to the user's home directory
+    const zshrcPath = path.join(os.homedir(), '.zshrc');
+    fs.writeFileSync(zshrcPath, zshrcContent.trim());
 
-    console.log('Zsh configuration has been updated. Please restart your terminal.');
+    console.log(`Zsh configuration has been updated. Please restart your terminal. The .zshrc file is located at: ${zshrcPath}`);
 })();
