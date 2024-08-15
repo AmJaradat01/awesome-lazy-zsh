@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2024-08-16
+
+- `package.json` enhancements:
+- Added `repository`, `homepage`, `bugs`, and `bin` fields.
+- Improved `keywords` for better discoverability.
+- Added a `start` script for easier execution.
+- Addressed minor issues in the installation process.
+- Updated README with additional instructions for dependencies.
+
 ## [1.0.1] - 2024-08-15
 
 - Initial README and CHANGELOG files.
