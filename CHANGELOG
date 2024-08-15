@@ -1,0 +1,15 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.0.1] - 2024-08-15
+
+- Initial README and CHANGELOG files.
+- Improved error handling in setup script.
+- Added support for installing Starship and Spaceship themes.
+
+## [1.0.0] - 2024-08-14
+
+- Initial release with default and custom installation options.
+- Support for multiple themes and plugins.
+- Automatic installation of Zsh, Oh-My-Zsh, and Homebrew.
