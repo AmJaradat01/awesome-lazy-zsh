@@ -2,23 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2024-09-05
+
+- **Major refactor** of the project structure:
+  - Removed `awesome-lazy-zsh.js`.
+  - Updated `package.json` to reflect the new structure.
+  - Reduced dependencies to only `chalk` and `prompts`.
+  - Updated README and contributing guidelines.
+
 ## [1.0.2] - 2024-08-16
 
-- `package.json` enhancements:
-- Added `repository`, `homepage`, `bugs`, and `bin` fields.
-- Improved `keywords` for better discoverability.
-- Added a `start` script for easier execution.
-- Addressed minor issues in the installation process.
-- Updated README with additional instructions for dependencies.
+- Added `repository`, `homepage`, `bugs`, and `bin` fields in `package.json`.
+- Improved keywords and added a `start` script.
+- Updated README with new instructions.
 
 ## [1.0.1] - 2024-08-15
 
-- Initial README and CHANGELOG files.
-- Improved error handling in setup script.
-- Added support for installing Starship and Spaceship themes.
+- Added support for Starship and Spaceship themes.
+- Improved error handling in the setup script.
 
 ## [1.0.0] - 2024-08-14
 
 - Initial release with default and custom installation options.
-- Support for multiple themes and plugins.
-- Automatic installation of Zsh, Oh-My-Zsh, and Homebrew.

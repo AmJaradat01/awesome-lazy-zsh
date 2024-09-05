@@ -1,0 +1,40 @@
+# Contributing to Awesome-Lazy-Zsh
+
+Thank you for your interest in contributing to Awesome-Lazy-Zsh! This repository provides a streamlined and customizable Zsh configuration. We welcome contributions to enhance functionality, add features, or fix bugs.
+
+## How to Contribute
+
+1. **Fork the Repository:** Click "Fork" to create a personal copy.
+2. **Clone Your Fork:** Clone your fork locally:
+    ```bash
+    git clone https://github.com/your-username/awesome-lazy-zsh.git
+    ```
+3. **Create a New Branch:** 
+    ```bash
+    git checkout -b feature-branch
+    ```
+4. **Make Changes:** Implement and test your changes.
+5. **Commit and Push:** 
+    ```bash
+    git add . && git commit -m "Add feature/fix"
+    git push origin feature-branch
+    ```
+6. **Pull Request:** Submit a pull request.
+
+## Code of Conduct
+
+Adhere to our Code of Conduct—be respectful and inclusive.
+
+## Coding Standards
+
+- Follow repository conventions.
+- Update documentation for changes.
+- Add tests for new features or fixes.
+
+## Reporting Issues
+
+Search for existing issues before reporting bugs or feature requests.
+
+## License
+
+By contributing, you agree your work is licensed under the [MIT License](https://opensource.org/licenses/MIT).
