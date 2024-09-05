@@ -1,66 +1,83 @@
-# Awesome-Lazy-Zsh
+# Awesome Lazy Zsh
 
-Awesome-Lazy-Zsh is a customizable Zsh setup tool that allows you to easily configure and enhance your Zsh environment with themes, plugins, and aliases.
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v2.0.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Awesome-Lazy-Zsh is a simplified and customizable Zsh setup tool for managing plugins and themes. It streamlines your terminal environment with an easy-to-use CLI interface, allowing you to manage `.zshrc` configurations effectively.
 
 ## Features
 
-- Default and custom installation options
-- Automatic installation of Zsh, Oh-My-Zsh, and Homebrew if not present
-- Theme selection including Powerlevel10k, Spaceship, Starship, and more
-- Plugin selection with autocomplete and additional plugins from the Oh-My-Zsh wiki
-- Customizable aliases and functions
-- Automatic `.zshrc` generation with user selections
+- **Plugin Management**: Install and manage plugins easily.
+- **Theme Customization**: Apply a variety of Zsh themes.
+- **Backup and Restore**: Safeguard your `.zshrc` configurations.
+- **Interactive CLI**: User-friendly setup options.
+- **Dependency Management**: Automatically checks for Git, Node.js, and Homebrew.
+
+## Table of Contents
+
+- [Awesome Lazy Zsh](#awesome-lazy-zsh)
+  - [Features](#features)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+    - [Step-by-Step Installation](#step-by-step-installation)
+  - [Usage](#usage)
+    - [Starting the Setup](#starting-the-setup)
+    - [Fresh Installation](#fresh-installation)
+    - [Default Installation](#default-installation)
+    - [Backup/Restore](#backuprestore)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Installation
 
-1. Clone the repository:
+To start using Awesome-Lazy-Zsh, clone the repository and run the `setup.sh` script.
 
-```bash
-git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
-cd awesome-lazy-zsh
-```
+### Step-by-Step Installation
 
-2. Install dependencies:
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
+    cd awesome-lazy-zsh
+    ```
 
-```bash
-npm install
-```
-
-3. Run the setup script:
-
-```bash
-node awesome-lazy-zsh.js
-```
-
-or 
-
-```bash
-npm start
-```
+2. **Run the Setup Script**:
+    ```bash
+    chmod +x setup.sh
+    ./setup.sh
+    ```
+    The script will install Git, Node.js, and Homebrew if necessary, and provide options for managing themes, plugins, and backups.
 
 ## Usage
 
-1. **Choose Installation Type:** Select between Default Installation or Custom Installation.
-2. **Select Theme:** Choose your desired theme (e.g., Powerlevel10k, Spaceship, Starship). // default: Spaceship
-3. **Select Plugins:** Select plugins from a list, or fetch additional plugins from the Oh-My-Zsh wiki.
-4. **Customize Aliases and Functions:** Optionally customize aliases and functions in your `.zshrc`.
+After running `setup.sh`, you can proceed with a fresh installation, default installation, or backup/restore options via the CLI.
 
-## Requirements
+### Starting the Setup
 
-- Node.js
-- Git
-- Homebrew (automatically installed if not present)
+Upon running `setup.sh`, the CLI will offer the following options:
 
-## Compatibility
+1. **Fresh Installation**: Select plugins and themes manually.
+2. **Default Installation**: Apply pre-configured plugins and themes.
+3. **Backup/Restore**: Manage `.zshrc` backups and restorations.
 
-- macOS
-- Linux (Not tested yet)
+### Fresh Installation
 
-## Troubleshooting
+This option allows you to select plugins and themes interactively, which will be installed and applied to your `.zshrc` configuration.
 
-- **Permissions Issues:** If you encounter permissions issues during installation, try running the commands with sudo.
-- **Missing Dependencies:** Ensure that Node.js, Git, and Homebrew are correctly installed on your system.
-- **Path Issues:** If commands aren't recognized, make sure your PATH environment variable is correctly set. You may need to restart your terminal or run source ~/.zshrc.
+### Default Installation
+
+This option installs a set of pre-configured plugins, such as `git`, `nvm`, `docker`, and applies the `spaceship` theme.
+
+### Backup/Restore
+
+This option lets you back up or restore your `.zshrc` file.
+
+## Contributing
+
+We welcome contributions! To contribute:
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit and push your changes.
+4. Open a pull request.
 
 ## License
 

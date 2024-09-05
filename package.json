@@ -1,19 +1,21 @@
 {
   "name": "awesome-lazy-zsh",
-  "version": "1.0.2",
-  "description": "Awesome-Lazy-Zsh is an all-in-one, customizable Zsh setup tool designed to enhance your terminal experience.",
-  "main": "awesome-lazy-zsh.js",
+  "version": "2.0.0",
+  "description": "Awesome-Lazy-Zsh is a streamlined Zsh setup tool, designed for easy customization of your terminal environment.",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node awesome-lazy-zsh.js"
+    "start": "node src/index.js",
+    "setup": "bash setup.sh"
   },
   "keywords": [
-    "zsh",
+    "zsh setup",
     "oh-my-zsh",
-    "terminal",
-    "customization",
-    "setup",
-    "automation"
+    "terminal customization",
+    "zsh plugins",
+    "zsh themes",
+    "automation",
+    "CLI"
   ],
   "author": "Ali M. Jaradat <AmJaradat01@gmail.com>",
   "license": "MIT",
@@ -25,14 +27,8 @@
   "bugs": {
     "url": "https://github.com/AmJaradat01/awesome-lazy-zsh/issues"
   },
-  "bin": {
-    "awesome-lazy-zsh": "./awesome-lazy-zsh.js"
-  },
   "dependencies": {
-    "axios": "^1.7.4",
     "chalk": "^5.3.0",
-    "cheerio": "^1.0.0",
-    "log-symbols": "^6.0.0",
     "prompts": "^2.4.2"
   }
 }
