@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2024-09-06
+
+- update Contributing & README files style spacing
+- add function to install npm dependencies
+- remove duplicated message
+
 ## [2.0.0] - 2024-09-05
 
 - **Major refactor** of the project structure:
