@@ -80,9 +80,21 @@ confirm_install() {
     fi
 }
 
+# Function to install npm dependencies
+install_npm_dependencies() {
+    if [ -f package.json ]; then
+        echo -e "⚠️  Installing npm dependencies..."
+        npm install && echo -e "✅ npm dependencies installed successfully."
+    else
+        echo -e "❌ package.json not found. Please make sure you are in the correct directory."
+        exit 1
+    fi
+}
+
 # Start the main script (index.js)
 start_main() {    
     if command_exists node; then
+        install_npm_dependencies
         node src/index.js
     else
         echo -e "❌ Node.js is required to run the setup. Please install Node.js and try again."

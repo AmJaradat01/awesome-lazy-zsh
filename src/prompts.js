@@ -54,7 +54,6 @@ export async function promptInitialAction() {
         });
 
         if (!startOption) {
-            console.error('Failed to select an option. Exiting.');
             return null;
         }
 
