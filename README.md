@@ -34,16 +34,19 @@ To start using Awesome-Lazy-Zsh, clone the repository and run the `setup.sh` scr
 ### Step-by-Step Installation
 
 1. **Clone the Repository**:
+
     ```bash
     git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
     cd awesome-lazy-zsh
     ```
 
 2. **Run the Setup Script**:
+
     ```bash
     chmod +x setup.sh
     ./setup.sh
     ```
+
     The script will install Git, Node.js, and Homebrew if necessary, and provide options for managing themes, plugins, and backups.
 
 ## Usage
