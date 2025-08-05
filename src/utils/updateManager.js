@@ -18,6 +18,10 @@ const PLUGINS_DIR = path.join(os.homedir(), '.oh-my-zsh/custom/plugins');
  * @returns {Promise<boolean>} Update success status
  */
 export async function updatePlugin(pluginName) {
+    if (!fs.existsSync(PLUGINS_DIR)) {
+        return false;
+    }
+    
     const pluginPath = path.join(PLUGINS_DIR, pluginName);
     
     if (!fs.existsSync(pluginPath) || !pluginRepos[pluginName]) {
@@ -25,7 +29,7 @@ export async function updatePlugin(pluginName) {
     }
 
     console.log(chalk.yellow(`🔄 Updating ${pluginName}...`));
-    const success = await runCommand(`cd ${pluginPath} && git pull origin main || git pull origin master`);
+    const success = await runCommand(`cd ${pluginPath} && git pull`);
     
     if (success) {
         console.log(chalk.green(`✅ ${pluginName} updated`));
@@ -38,9 +42,19 @@ export async function updatePlugin(pluginName) {
  * @returns {Promise<void>}
  */
 export async function updateAllPlugins() {
+    if (!fs.existsSync(PLUGINS_DIR)) {
+        console.log(chalk.yellow('⚠️ No custom plugins directory found'));
+        return;
+    }
+    
     const plugins = fs.readdirSync(PLUGINS_DIR).filter(dir => 
         fs.statSync(path.join(PLUGINS_DIR, dir)).isDirectory()
     );
+    
+    if (plugins.length === 0) {
+        console.log(chalk.yellow('⚠️ No custom plugins to update'));
+        return;
+    }
     
     console.log(chalk.blue('🔄 Updating all plugins...'));
     const results = await Promise.all(plugins.map(updatePlugin));
