@@ -249,7 +249,7 @@ confirm_install() {
     echo "✓ Installation logging to: $LOG_FILE"
     echo
     read -p "Do you want to proceed with the installation? (y/n): " answer
-    if [[ "${answer,,}" != "y" ]]; then
+    if [[ "$(echo "$answer" | tr '[:upper:]' '[:lower:]')" != "y" ]]; then
         log_info "Installation cancelled by user"
         exit 0
     fi
