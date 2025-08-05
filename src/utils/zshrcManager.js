@@ -99,6 +99,11 @@ alias dstop='docker stop \$(docker ps -a -q)'
 alias drm='docker rm \$(docker ps -a -q)'
 alias dimages='docker images'
 alias dbuild='docker build -t'
+
+# Docker CLI completions
+fpath=(~/.docker/completions \$fpath)
+autoload -Uz compinit
+compinit
 `;
     }
 
