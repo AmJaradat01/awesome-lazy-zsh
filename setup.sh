@@ -374,7 +374,7 @@ start_main() {
     fi
     
     if node src/index.js; then
-        log_success "Awesome-Lazy-Zsh setup completed successfully!"
+        return 0
     else
         log_error "Failed to run main application"
         return 1
