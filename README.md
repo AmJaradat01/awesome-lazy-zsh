@@ -36,14 +36,26 @@ Awesome-Lazy-Zsh is a powerful yet simple tool that automates your Zsh setup wit
 
 ## 🚀 Quick Start
 
-**One-line installation:**
+### Via Homebrew (Recommended) 🍺
+```bash
+# Option 1: Direct install
+brew install amjaradat01/awesome-lazy-zsh/awesome-lazy-zsh
 
+# Option 2: Add tap first (shorter)
+brew tap amjaradat01/awesome-lazy-zsh
+brew install awesome-lazy-zsh
+
+# Run the tool
+awesome-lazy-zsh
+```
+
+### Via Git Clone
+**One-line installation:**
 ```bash
 git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git && cd awesome-lazy-zsh && ./setup.sh
 ```
 
 **Step-by-step:**
-
 1. **Clone & Enter**
    ```bash
    git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
