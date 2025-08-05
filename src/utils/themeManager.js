@@ -1,11 +1,6 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This file manages the installation and configuration of themes for Awesome-Lazy-Zsh.
- * It handles applying selected or default themes and updating the .zshrc file.
- * @lastModified 4-Sep-2024
+ * Theme installation and management utilities
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
 import { getUserSelection } from '../prompts.js';
@@ -16,23 +11,46 @@ import chalk from 'chalk';
 import { themeRepos } from './config.js';  // Import theme repository mappings
 import { updateZshrc } from './zshrcManager.js';
 
-// Function to install a theme
+/**
+ * Installs a theme with validation and fallback
+ * @param {string} themeName - Theme name to install
+ * @returns {Promise<boolean>} Installation success status
+ */
 async function installTheme(themeName) {
+    const repoUrl = themeRepos[themeName];
+    
+    if (!repoUrl || repoUrl === '') {
+        console.log(chalk.blue(`ℹ️ ${themeName} is a built-in Oh My Zsh theme.`));
+        return true;
+    }
+
     const themePath = `${os.homedir()}/.oh-my-zsh/custom/themes/${themeName}`;
-    if (themeRepos[themeName] && themeRepos[themeName] !== '') {
-        if (!fs.existsSync(themePath)) {
-            console.log(chalk.yellow(`⚠️ Installing ${themeName} theme...`));
-            await runCommand(`git clone ${themeRepos[themeName]} ${themePath}`);
-            console.log(chalk.green(`✅ ${themeName} theme installed.`));
+    
+    if (fs.existsSync(themePath)) {
+        console.log(chalk.blue(`ℹ️ ${themeName} theme is already installed.`));
+        return true;
+    }
+
+    try {
+        console.log(chalk.yellow(`⚠️ Installing ${themeName} theme...`));
+        const success = await runCommand(`git clone ${repoUrl} ${themePath}`);
+        
+        if (success && fs.existsSync(themePath)) {
+            console.log(chalk.green(`✅ ${themeName} theme installed successfully.`));
+            return true;
         } else {
-            console.log(chalk.blue(`ℹ️ ${themeName} theme is already installed.`));
+            throw new Error('Theme directory not created');
         }
-    } else {
-        console.log(chalk.blue(`ℹ️ ${themeName} theme is already built into Oh My Zsh.`));
+    } catch (error) {
+        console.error(chalk.red(`❌ Failed to install ${themeName} theme: ${error.message}`));
+        return false;
     }
 }
 
-// Function to apply the selected theme
+/**
+ * Interactive theme selection and application
+ * @param {string[]} plugins - Installed plugins for .zshrc generation
+ */
 export async function chooseTheme(plugins = []) {
     const themes = Object.keys(themeRepos);
 
@@ -45,24 +63,39 @@ export async function chooseTheme(plugins = []) {
     });
 
     if (!selectedTheme) {
-        console.error(chalk.red('❌ No theme selected. Exiting.'));
-        return;  // Add return to prevent further execution
+        console.error(chalk.red('❌ No theme selected. Using default theme.'));
+        updateZshrc(plugins, 'robbyrussell');
+        return;
     }
 
     console.log(chalk.bold.cyan('Selected theme:'), selectedTheme);
-    await installTheme(selectedTheme);
+    const success = await installTheme(selectedTheme);
 
-    console.log(chalk.green(`✅ Applying theme: ${selectedTheme}`));
-
-    // Update .zshrc with selected theme and plugins
-    updateZshrc(plugins, selectedTheme);  // Pass both plugins and selected theme
+    if (success) {
+        console.log(chalk.green(`✅ Applying theme: ${selectedTheme}`));
+        await updateZshrc(plugins, selectedTheme);
+    } else {
+        console.log(chalk.yellow(`⚠️ Failed to install ${selectedTheme}, using default theme.`));
+        await updateZshrc(plugins, 'robbyrussell');
+    }
 }
 
-// Function to apply the default theme
+/**
+ * Applies default theme with fallback handling
+ * @param {string[]} plugins - Installed plugins for .zshrc generation
+ */
 export async function applyDefaultTheme(plugins) {
-    const defaultTheme = 'spaceship';  // Define your default theme here
+    const defaultTheme = 'spaceship';
     console.log(chalk.green(`✅ Applying default theme: ${defaultTheme}`));
-    await installTheme(defaultTheme);
-    updateZshrc(plugins, defaultTheme);  // Pass an empty plugin array for default installation
-    console.log(chalk.green.bold('✅ Default theme applied successfully.'));
+    
+    const success = await installTheme(defaultTheme);
+    
+    if (success) {
+        await updateZshrc(plugins, defaultTheme);
+        console.log(chalk.green.bold('✅ Default theme applied successfully.'));
+    } else {
+        console.log(chalk.yellow(`⚠️ Failed to install ${defaultTheme}, using built-in theme.`));
+        await updateZshrc(plugins, 'robbyrussell');
+        console.log(chalk.green.bold('✅ Built-in theme applied successfully.'));
+    }
 }

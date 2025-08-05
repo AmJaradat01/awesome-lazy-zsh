@@ -1,46 +1,142 @@
 # Contributing to Awesome-Lazy-Zsh
 
-Thank you for your interest in contributing to Awesome-Lazy-Zsh! This repository provides a streamlined and customizable Zsh configuration. We welcome contributions to enhance functionality, add features, or fix bugs.
+Thank you for your interest in contributing! This guide will help you get started with contributing to Awesome-Lazy-Zsh.
 
-## How to Contribute
+## 🚀 Quick Start
 
-1. **Fork the Repository:** Click "Fork" to create a personal copy.
-2. **Clone Your Fork:** Clone your fork locally:
+1. Fork the repository
+2. Create a feature branch following git-flow
+3. Make your changes
+4. Submit a pull request
 
-    ```bash
-    git clone https://github.com/your-username/awesome-lazy-zsh.git
-    ```
+## 🌊 Git Flow Workflow
 
-3. **Create a New Branch:**
+We follow **git-flow** branching model:
 
-    ```bash
-    git checkout -b feature-branch
-    ```
+### Branch Types
+- `main` - Production-ready code
+- `develop` - Integration branch for features
+- `feature/*` - New features
+- `release/*` - Release preparation
+- `hotfix/*` - Critical fixes
 
-4. **Make Changes:** Implement and test your changes.
-5. **Commit and Push:**
+### Creating Features
+```bash
+# Start from develop branch
+git checkout develop
+git pull origin develop
 
-    ```bash
-    git add . && git commit -m "Add feature/fix"
-    git push origin feature-branch
-    ```
+# Create feature branch
+git checkout -b feature/your-feature-name
 
-6. **Pull Request:** Submit a pull request.
+# Work on your feature
+# ...
 
-## Code of Conduct
+# Push feature branch
+git push origin feature/your-feature-name
+```
 
-Adhere to our Code of Conduct—be respectful and inclusive.
+### Commit Messages
+Follow conventional commits:
+```
+type(scope): description
 
-## Coding Standards
+feat(plugins): add custom plugin support
+fix(setup): resolve installation error
+docs(readme): update installation guide
+```
 
-- Follow repository conventions.
-- Update documentation for changes.
-- Add tests for new features or fixes.
+## 🐛 Reporting Issues
 
-## Reporting Issues
+When reporting bugs, include:
+- Clear description
+- Steps to reproduce
+- Expected vs actual behavior
+- System information (OS, terminal, shell version)
+- Error messages/logs
 
-Search for existing issues before reporting bugs or feature requests.
+## 💻 Development Setup
 
-## License
+```bash
+# Clone your fork
+git clone https://github.com/your-username/awesome-lazy-zsh.git
+cd awesome-lazy-zsh
 
-By contributing, you agree your work is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+# Install dependencies
+npm install
+
+# Test the setup
+./setup.sh
+```
+
+## 🧪 Testing
+
+Before submitting:
+- Test on multiple systems (macOS/Linux)
+- Verify existing functionality works
+- Test edge cases and error scenarios
+- Run the setup script end-to-end
+
+## 📝 Code Standards
+
+- Use meaningful names for variables/functions
+- Add JSDoc comments for functions
+- Follow existing code style
+- Handle errors gracefully
+- Add appropriate logging
+
+## 🎯 Areas for Contribution
+
+- **New Plugins**: Add support for popular development tools
+- **Themes**: Integrate new Zsh themes
+- **System Support**: Improve compatibility
+- **Documentation**: Enhance guides and examples
+- **Bug Fixes**: Resolve reported issues
+- **Performance**: Optimize installation speed
+
+## 📋 Pull Request Process
+
+1. **Target Branch**: Submit PRs to `develop` branch
+2. **Description**: Clearly describe changes and motivation
+3. **Testing**: Include test results
+4. **Documentation**: Update relevant docs
+5. **Review**: Address feedback promptly
+
+### PR Template
+```markdown
+## Changes
+- Brief description of changes
+
+## Testing
+- [ ] Tested on macOS
+- [ ] Tested on Linux
+- [ ] Existing functionality works
+
+## Documentation
+- [ ] Updated README if needed
+- [ ] Updated CHANGELOG
+```
+
+## 🏷️ Release Process
+
+Maintainers handle releases:
+1. Create `release/x.x.x` branch from `develop`
+2. Update version numbers and changelog
+3. Merge to `main` and tag
+4. Merge back to `develop`
+
+## 🤝 Code of Conduct
+
+- Be respectful and inclusive
+- Provide constructive feedback
+- Help others learn and grow
+- Focus on the code, not the person
+
+## ❓ Questions?
+
+Feel free to:
+- Open an issue for questions
+- Start a discussion
+- Reach out to maintainers
+
+Thank you for contributing! 🎉

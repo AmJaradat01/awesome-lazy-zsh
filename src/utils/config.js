@@ -1,23 +1,19 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This configuration file contains repository mappings for plugins and themes used in Awesome-Lazy-Zsh.
- * @lastModified 4-Sep-2024
+ * Configuration mappings for plugins and themes
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-// Plugin repository mappings
+/** Plugin repository mappings - empty string indicates built-in Oh My Zsh plugin */
 export const pluginRepos = {
-    'git': 'https://github.com/ohmyzsh/ohmyzsh.git',
-    'git-flow': 'https://github.com/nvie/gitflow.git',
-    'npm': 'https://github.com/ohmyzsh/ohmyzsh.git',
-    'nvm': 'https://github.com/nvm-sh/nvm.git',
-    'docker': 'https://github.com/ohmyzsh/ohmyzsh.git',
-    'docker-compose': 'https://github.com/ohmyzsh/ohmyzsh.git',
-    'kubectl': 'https://github.com/ohmyzsh/ohmyzsh.git',
-    'terraform': 'https://github.com/hashicorp/terraform.git',
-    'vscode': 'https://github.com/ohmyzsh/ohmyzsh.git',
+    'git': '', // Built-in Oh My Zsh plugin
+    'git-flow': '', // Built-in Oh My Zsh plugin
+    'npm': '', // Built-in Oh My Zsh plugin
+    'nvm': '', // Built-in Oh My Zsh plugin
+    'docker': '', // Built-in Oh My Zsh plugin
+    'docker-compose': '', // Built-in Oh My Zsh plugin
+    'kubectl': '', // Built-in Oh My Zsh plugin
+    'terraform': '', // Built-in Oh My Zsh plugin
+    'vscode': '', // Built-in Oh My Zsh plugin
     'fzf': 'https://github.com/junegunn/fzf.git',
     'z': 'https://github.com/agkozak/zsh-z.git',
     'thefuck': 'https://github.com/nvbn/thefuck.git',
@@ -26,11 +22,11 @@ export const pluginRepos = {
     'zsh-syntax-highlighting': 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
 };
 
-// Theme repository mappings
+/** Theme repository mappings - empty string indicates built-in Oh My Zsh theme */
 export const themeRepos = {
-    'robbyrussell': '',  // Default theme in Oh My Zsh
+    'robbyrussell': '',
     'powerlevel10k': 'https://github.com/romkatv/powerlevel10k.git',
-    'agnoster': '',      // Comes by default with Oh My Zsh
+    'agnoster': '',
     'spaceship': 'https://github.com/spaceship-prompt/spaceship-prompt.git',
     'starship': 'https://github.com/starship/starship.git'
 };
