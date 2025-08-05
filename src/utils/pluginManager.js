@@ -1,11 +1,6 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This file manages the installation and configuration of plugins for Awesome-Lazy-Zsh.
- * It handles fresh installation, default installation, and updating the .zshrc file.
- * @lastModified 4-Sep-2024
+ * Plugin installation and management utilities
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
 import { getUserSelection } from '../prompts.js';
@@ -17,32 +12,54 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 
-// Default plugins list
+/** Default plugin selection for quick setup */
 const defaultPlugins = [
     'git', 'git-flow', 'npm', 'nvm', 'docker', 'docker-compose',
     'kubectl', 'terraform', 'vscode', 'fzf', 'z',
     'zsh-autocomplete', 'zsh-autosuggestions', 'zsh-syntax-highlighting'
 ];
 
-// Function to install a plugin
+/**
+ * Installs a single plugin with validation
+ * @param {string} pluginName - Plugin name to install
+ * @returns {Promise<boolean>} Installation success status
+ */
 async function installPlugin(pluginName) {
+    const repoUrl = pluginRepos[pluginName];
+    
+    if (!repoUrl || repoUrl === '') {
+        console.log(chalk.blue(`ℹ️ ${pluginName} is a built-in Oh My Zsh plugin.`));
+        return true;
+    }
+
     const pluginPath = path.join(os.homedir(), `.oh-my-zsh/custom/plugins/${pluginName}`);
 
-    if (!fs.existsSync(pluginPath)) {
-        const repoUrl = pluginRepos[pluginName];
-        if (repoUrl) {
-            console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
-            await runCommand(`git clone ${repoUrl} ${pluginPath}`);
-            console.log(chalk.green(`✅ ${pluginName} plugin installed successfully.`));
-        } else {
-            console.error(chalk.red(`❌ Error installing plugin ${pluginName}: Repository URL not found.`));
-        }
-    } else {
+    if (fs.existsSync(pluginPath)) {
         console.log(chalk.blue(`ℹ️ ${pluginName} plugin is already installed.`));
+        return true;
+    }
+
+    try {
+        console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
+        await runCommand(`git clone ${repoUrl} ${pluginPath}`);
+        
+        // Verify installation
+        if (fs.existsSync(pluginPath)) {
+            console.log(chalk.green(`✅ ${pluginName} plugin installed successfully.`));
+            return true;
+        } else {
+            throw new Error('Plugin directory not created');
+        }
+    } catch (error) {
+        console.error(chalk.red(`❌ Failed to install ${pluginName}: ${error.message}`));
+        return false;
     }
 }
 
-// Function to install selected plugins (fresh installation)
+/**
+ * Runs interactive plugin selection and installation
+ * @returns {Promise<string[]|null>} Installed plugin names or null on failure
+ */
 export async function runFreshInstallation() {
     try {
         console.log(chalk.bold.blue('Select plugins to install:'));
@@ -60,32 +77,69 @@ export async function runFreshInstallation() {
 
         console.log(chalk.bold.cyan('Selected plugins:'), plugins.join(', '));
 
+        const installedPlugins = [];
+        const failedPlugins = [];
+
         for (const plugin of plugins) {
-            await installPlugin(plugin);
+            const success = await installPlugin(plugin);
+            if (success) {
+                installedPlugins.push(plugin);
+            } else {
+                failedPlugins.push(plugin);
+            }
         }
 
-        // Pass the selected plugins to the .zshrc updater
-        updateZshrc(plugins, 'spaceship');
-        return plugins;  // Return selected plugins
+        if (failedPlugins.length > 0) {
+            console.log(chalk.yellow(`⚠️ Failed to install: ${failedPlugins.join(', ')}`));
+        }
+
+        if (installedPlugins.length === 0) {
+            console.error(chalk.red('❌ No plugins were successfully installed.'));
+            return null;
+        }
+
+        // Pass the successfully installed plugins to the .zshrc updater
+        await updateZshrc(installedPlugins, 'spaceship');
+        return installedPlugins;
     } catch (error) {
         console.error(chalk.red('❌ Error during plugin installation process:'), error);
         return null;
     }
 }
 
-// Function to install default plugins
+/**
+ * Installs predefined default plugins
+ * @returns {Promise<string[]|null>} Installed plugin names or null on failure
+ */
 export async function runDefaultInstallation() {
     try {
         console.log(chalk.bold.blue('Installing default plugins...'));
 
+        const installedPlugins = [];
+        const failedPlugins = [];
+
         for (const plugin of defaultPlugins) {
-            await installPlugin(plugin);
+            const success = await installPlugin(plugin);
+            if (success) {
+                installedPlugins.push(plugin);
+            } else {
+                failedPlugins.push(plugin);
+            }
         }
 
-        // Update .zshrc with the default plugins and theme
-        updateZshrc(defaultPlugins, 'spaceship');  // Ensure plugins are passed here
-        console.log(chalk.green('✅ Default plugins installed successfully.'));
-        return defaultPlugins;
+        if (failedPlugins.length > 0) {
+            console.log(chalk.yellow(`⚠️ Failed to install: ${failedPlugins.join(', ')}`));
+        }
+
+        if (installedPlugins.length === 0) {
+            console.error(chalk.red('❌ No default plugins were successfully installed.'));
+            return null;
+        }
+
+        // Update .zshrc with the successfully installed plugins and theme
+        await updateZshrc(installedPlugins, 'spaceship');
+        console.log(chalk.green('✅ Default plugins installation completed.'));
+        return installedPlugins;
     } catch (error) {
         console.error(chalk.red('❌ Error during default plugin installation:'), error);
         return null;

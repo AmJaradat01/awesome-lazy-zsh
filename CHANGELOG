@@ -2,31 +2,58 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2024-12-19
+
+### Added
+- **Plugin Update Manager**: Auto-update installed plugins with rollback support
+- **Configuration Profiles**: Save, switch, and export different setups
+- **Custom Plugin Support**: Add plugins from any Git repository
+- **System Integration**: macOS/Linux optimizations and terminal integration
+- **Enhanced Alias Manager**: Comprehensive development shortcuts
+- **Oh My Zsh Auto-Installation**: Automatic prerequisite setup
+
+### Fixed
+- **Plugin Repository Mappings**: Corrected incorrect plugin URLs
+- **Installation Validation**: Added success/failure tracking
+- **Error Handling**: Comprehensive error recovery throughout
+- **Backup System**: Automatic .zshrc backup before modifications
+- **Command Execution**: Improved async handling and status returns
+
+### Changed
+- **Setup Script**: Completed missing functions and improved security
+- **User Interface**: Enhanced CLI with new menu options
+- **Documentation**: Completely rewritten README with better structure
+- **Code Quality**: Added proper validation and error handling
+
+### Security
+- Added installation verification and backup systems
+- Improved error recovery and rollback mechanisms
+
 ## [2.0.1] - 2024-09-06
 
-- update Contributing & README files style spacing
-- add function to install npm dependencies
-- remove duplicated message
+- Update Contributing & README files style spacing
+- Add function to install npm dependencies
+- Remove duplicated message
 
 ## [2.0.0] - 2024-09-05
 
-- **Major refactor** of the project structure:
-  - Removed `awesome-lazy-zsh.js`.
-  - Updated `package.json` to reflect the new structure.
-  - Reduced dependencies to only `chalk` and `prompts`.
-  - Updated README and contributing guidelines.
+- **Major refactor** of the project structure
+- Removed `awesome-lazy-zsh.js`
+- Updated `package.json` to reflect the new structure
+- Reduced dependencies to only `chalk` and `prompts`
+- Updated README and contributing guidelines
 
 ## [1.0.2] - 2024-08-16
 
-- Added `repository`, `homepage`, `bugs`, and `bin` fields in `package.json`.
-- Improved keywords and added a `start` script.
-- Updated README with new instructions.
+- Added `repository`, `homepage`, `bugs`, and `bin` fields in `package.json`
+- Improved keywords and added a `start` script
+- Updated README with new instructions
 
 ## [1.0.1] - 2024-08-15
 
-- Added support for Starship and Spaceship themes.
-- Improved error handling in the setup script.
+- Added support for Starship and Spaceship themes
+- Improved error handling in the setup script
 
 ## [1.0.0] - 2024-08-14
 
-- Initial release with default and custom installation options.
+- Initial release with default and custom installation options

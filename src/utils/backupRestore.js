@@ -1,11 +1,6 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This file handles the backup and restoration of the .zshrc file for Awesome-Lazy-Zsh.
- * It includes functions to back up, restore, and manage user selections during the backup/restore process.
- * @lastModified 4-Sep-2024
+ * .zshrc backup and restore utilities
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
 import fs from 'fs';
@@ -13,7 +8,10 @@ import path from 'path';
 import os from 'os';
 import prompts from 'prompts';
 
-// Function to ensure the backup folder exists
+/**
+ * Ensures backup directory exists
+ * @returns {string} Backup directory path
+ */
 function ensureBackupFolderExists() {
     const backupFolder = path.join(os.homedir(), '.awesome-lazy-zsh_backup');
     if (!fs.existsSync(backupFolder)) {
@@ -28,7 +26,9 @@ function ensureBackupFolderExists() {
     return backupFolder;
 }
 
-// Function to create a backup of the current .zshrc file
+/**
+ * Creates timestamped backup of current .zshrc
+ */
 export function backupZshrc() {
     const homeDir = os.homedir();
     const zshrcPath = path.join(homeDir, '.zshrc');
@@ -47,7 +47,9 @@ export function backupZshrc() {
     }
 }
 
-// Function to restore .zshrc file from a selected backup
+/**
+ * Interactive .zshrc restoration from backup
+ */
 export async function restoreZshrc() {
     const backupFolder = ensureBackupFolderExists();
 
@@ -92,7 +94,9 @@ export async function restoreZshrc() {
     }
 }
 
-// Main handler for backup/restore process
+/**
+ * Main backup/restore workflow handler
+ */
 export async function handleRestoreBackup() {
     const { backupOption } = await prompts({
         type: 'select',
