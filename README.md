@@ -1,87 +1,210 @@
 # Awesome Lazy Zsh
 
-[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v2.0.1-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v3.0.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Awesome-Lazy-Zsh is a simplified and customizable Zsh setup tool for managing plugins and themes. It streamlines your terminal environment with an easy-to-use CLI interface, allowing you to manage `.zshrc` configurations effectively.
+🚀 **The easiest way to set up and manage your Zsh environment**
 
-## Features
+Awesome-Lazy-Zsh is a powerful yet simple tool that automates your Zsh setup with plugins, themes, and configurations. Perfect for developers who want a beautiful, functional terminal without the hassle.
 
-- **Plugin Management**: Install and manage plugins easily.
-- **Theme Customization**: Apply a variety of Zsh themes.
-- **Backup and Restore**: Safeguard your `.zshrc` configurations.
-- **Interactive CLI**: User-friendly setup options.
-- **Dependency Management**: Automatically checks for Git, Node.js, and Homebrew.
+## ✨ Features
 
-## Table of Contents
+### Core Features
+- 🔌 **Smart Plugin Management** - Install, update, and manage 15+ popular plugins
+- 🎨 **Theme Customization** - Choose from popular themes like Spaceship, Powerlevel10k
+- 💾 **Backup & Restore** - Automatic `.zshrc` backups before any changes
+- 🖥️ **Interactive CLI** - Beautiful, user-friendly setup wizard
+- 🔧 **Auto Dependencies** - Installs Git, Node.js, Homebrew automatically
 
-- [Awesome Lazy Zsh](#awesome-lazy-zsh)
-  - [Features](#features)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-    - [Step-by-Step Installation](#step-by-step-installation)
-  - [Usage](#usage)
-    - [Starting the Setup](#starting-the-setup)
-    - [Fresh Installation](#fresh-installation)
-    - [Default Installation](#default-installation)
-    - [Backup/Restore](#backuprestore)
-  - [Contributing](#contributing)
-  - [License](#license)
+### New Features
+- 🔄 **Plugin Updates** - Keep all plugins up-to-date with one command
+- 📁 **Configuration Profiles** - Save and switch between different setups (work/personal)
+- 🌐 **Custom Plugins** - Add plugins from any Git repository
+- ⚡ **System Integration** - Optimized for macOS/Linux with smart path detection
+- 🎯 **Smart Aliases** - 20+ useful development shortcuts
 
-## Installation
+## 📋 Table of Contents
 
-To start using Awesome-Lazy-Zsh, clone the repository and run the `setup.sh` script.
+- [Quick Start](#-quick-start)
+- [Features](#-features)
+- [Installation Options](#-installation-options)
+- [Plugin Management](#-plugin-management)
+- [Profile Management](#-profile-management)
+- [Available Plugins](#-available-plugins)
+- [Available Themes](#-available-themes)
+- [System Requirements](#-system-requirements)
+- [Contributing](#-contributing)
 
-### Step-by-Step Installation
+## 🚀 Quick Start
 
-1. **Clone the Repository**:
+**One-line installation:**
 
-    ```bash
-    git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
-    cd awesome-lazy-zsh
-    ```
+```bash
+git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git && cd awesome-lazy-zsh && ./setup.sh
+```
 
-2. **Run the Setup Script**:
+**Step-by-step:**
 
-    ```bash
-    chmod +x setup.sh
-    ./setup.sh
-    ```
+1. **Clone & Enter**
+   ```bash
+   git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
+   cd awesome-lazy-zsh
+   ```
 
-    The script will install Git, Node.js, and Homebrew if necessary, and provide options for managing themes, plugins, and backups.
+2. **Run Setup**
+   ```bash
+   ./setup.sh
+   ```
 
-## Usage
+3. **Choose Your Setup**
+   - 🆕 **Fresh Installation** - Pick your own plugins and themes
+   - ⚡ **Default Installation** - Pre-configured setup for developers
+   - 🔄 **Update Plugins** - Keep everything current
+   - 📁 **Manage Profiles** - Switch between configurations
 
-After running `setup.sh`, you can proceed with a fresh installation, default installation, or backup/restore options via the CLI.
+**That's it!** Your terminal will be transformed in minutes.
 
-### Starting the Setup
+## 🎛️ Installation Options
 
-Upon running `setup.sh`, the CLI will offer the following options:
+### 🆕 Fresh Installation
+**Perfect for customization lovers**
+- Choose from 15+ plugins (git, docker, kubectl, fzf, etc.)
+- Pick your favorite theme (spaceship, powerlevel10k, starship)
+- Interactive selection with preview
 
-1. **Fresh Installation**: Select plugins and themes manually.
-2. **Default Installation**: Apply pre-configured plugins and themes.
-3. **Backup/Restore**: Manage `.zshrc` backups and restorations.
+### ⚡ Default Installation  
+**Perfect for getting started quickly**
+- Pre-selected developer plugins: `git`, `docker`, `nvm`, `kubectl`, `fzf`
+- Spaceship theme (beautiful and fast)
+- Optimized aliases and shortcuts
 
-### Fresh Installation
+### 🔄 Update Plugins
+**Keep everything current**
+- Updates all installed plugins to latest versions
+- Safe rollback if something breaks
+- Shows update progress and results
 
-This option allows you to select plugins and themes interactively, which will be installed and applied to your `.zshrc` configuration.
+### 📁 Profile Management
+**Switch between setups instantly**
+- Save current configuration as named profile
+- Switch between work/personal setups
+- Export profiles to share with team
 
-### Default Installation
+### 🌐 Custom Plugins
+**Add any plugin from any repository**
+- Install plugins from GitHub, GitLab, etc.
+- Automatic integration with existing setup
+- Persistent custom plugin registry
 
-This option installs a set of pre-configured plugins, such as `git`, `nvm`, `docker`, and applies the `spaceship` theme.
+## 🔌 Plugin Management
 
-### Backup/Restore
+**Built-in Plugin Updates:**
+```bash
+# Run setup again and choose "Update plugins"
+./setup.sh
+```
 
-This option lets you back up or restore your `.zshrc` file.
+**Add Custom Plugin:**
+```bash
+# Through the CLI menu
+./setup.sh → "Add custom plugin"
+# Enter: plugin-name and repository-url
+```
 
-## Contributing
+**Profile Management:**
+```bash
+# Save current setup
+./setup.sh → "Manage profiles" → "Save current as profile"
 
-We welcome contributions! To contribute:
+# Switch profiles
+./setup.sh → "Manage profiles" → "Switch profile"
+```
 
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit and push your changes.
-4. Open a pull request.
+## 📁 Profile Management
 
-## License
+Profiles let you maintain different Zsh configurations:
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+- **Work Profile**: Docker, Kubernetes, AWS plugins
+- **Personal Profile**: Git, Node.js, fun themes
+- **Minimal Profile**: Just essentials for servers
+
+**Example:**
+```bash
+# Create work profile with specific plugins
+Work Profile: git, docker, kubectl, terraform + spaceship theme
+
+# Create personal profile  
+Personal Profile: git, nvm, fzf, z + powerlevel10k theme
+
+# Switch instantly
+./setup.sh → Manage profiles → Switch profile → Work
+```
+
+## 🔌 Available Plugins
+
+| Plugin | Description | Auto-installed |
+|--------|-------------|----------------|
+| `git` | Git shortcuts and info | ✅ Default |
+| `docker` | Docker commands and aliases | ✅ Default |
+| `nvm` | Node.js version management | ✅ Default |
+| `kubectl` | Kubernetes CLI shortcuts | ✅ Default |
+| `fzf` | Fuzzy finder integration | ✅ Default |
+| `zsh-autosuggestions` | Command suggestions | ✅ Default |
+| `zsh-syntax-highlighting` | Syntax highlighting | ✅ Default |
+| `z` | Smart directory jumping | ⚡ Fresh only |
+| `terraform` | Terraform shortcuts | ⚡ Fresh only |
+| `thefuck` | Correct previous commands | ⚡ Fresh only |
+
+## 🎨 Available Themes
+
+| Theme | Description | Speed | Customization |
+|-------|-------------|-------|---------------|
+| `spaceship` | Modern, feature-rich | ⚡⚡⚡ | 🎨🎨🎨 |
+| `powerlevel10k` | Fastest, most customizable | ⚡⚡⚡⚡ | 🎨🎨🎨🎨 |
+| `starship` | Cross-shell, Rust-powered | ⚡⚡⚡⚡ | 🎨🎨🎨 |
+| `agnoster` | Clean, git-aware | ⚡⚡⚡ | 🎨🎨 |
+| `robbyrussell` | Simple, fast default | ⚡⚡⚡⚡ | 🎨 |
+
+## 💻 System Requirements
+
+**Supported Systems:**
+- ✅ macOS (Intel & Apple Silicon)
+- ✅ Linux (Ubuntu, Debian, CentOS, etc.)
+- ✅ WSL2 (Windows Subsystem for Linux)
+
+**Auto-installed Dependencies:**
+- Git (for plugin management)
+- Node.js (for CLI interface)
+- Homebrew (macOS/Linux package manager)
+- Oh My Zsh (Zsh framework)
+
+**Terminal Compatibility:**
+- ✅ iTerm2 (macOS) - Full integration
+- ✅ Terminal.app (macOS)
+- ✅ GNOME Terminal (Linux)
+- ✅ VS Code Terminal
+- ✅ Any Zsh-compatible terminal
+
+## 🤝 Contributing
+
+**Quick Contribution:**
+1. 🍴 Fork the repo
+2. 🌿 Create feature branch: `git checkout -b amazing-feature`
+3. 💾 Commit changes: `git commit -m 'Add amazing feature'`
+4. 📤 Push branch: `git push origin amazing-feature`
+5. 🔄 Open Pull Request
+
+**Ideas Welcome:**
+- New plugin integrations
+- Theme improvements
+- System compatibility
+- Documentation updates
+
+## 📄 License
+
+MIT License - feel free to use in personal and commercial projects!
+
+---
+
+**Made with ❤️ for developers who love beautiful, functional terminals**
+
+⭐ **Star this repo if it helped you!** ⭐
