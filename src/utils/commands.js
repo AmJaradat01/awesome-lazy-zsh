@@ -1,26 +1,27 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This file contains utility functions for executing shell commands in Awesome-Lazy-Zsh.
- * It handles command execution and related error handling.
- * @lastModified 4-Sep-2024
+ * Shell command execution utilities
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
 import { execSync } from 'child_process';
 import chalk from 'chalk';
 
 /**
- * Executes a shell command synchronously and handles errors.
- * @param {string} command - The shell command to execute.
+ * Executes shell command with error handling
+ * @param {string} command - Shell command to execute
+ * @returns {Promise<boolean>} Command execution success status
  */
 export function runCommand(command) {
-    try {
-        console.log(chalk.blue(`🚀 Running: ${command}`));
-        execSync(command, { stdio: 'inherit' });
-        console.log(chalk.green(`✅ Command executed successfully: ${command}`));
-    } catch (error) {
-        console.error(chalk.red(`❌ Command failed: ${command}\nError: ${error.message}`));
-    }
+    return new Promise((resolve) => {
+        try {
+            console.log(chalk.blue(`🚀 Running: ${command}`));
+            execSync(command, { stdio: 'inherit' });
+            console.log(chalk.green(`✅ Command executed successfully`));
+            resolve(true);
+        } catch (error) {
+            console.error(chalk.red(`❌ Command failed: ${command}`));
+            console.error(chalk.red(`Error: ${error.message}`));
+            resolve(false);
+        }
+    });
 }

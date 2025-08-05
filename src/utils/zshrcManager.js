@@ -1,18 +1,19 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This file manages the generation and update of the .zshrc file, including the configuration of plugins and themes.
- * @lastModified 4-Sep-2024
+ * .zshrc file generation and management utilities
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
+import { generateSystemOptimizations, setupTerminalIntegration } from './systemIntegration.js';
 
-// Function to extract existing plugins from the .zshrc file
+/**
+ * Extracts plugin list from existing .zshrc content
+ * @param {string} zshrcContent - Current .zshrc file content
+ * @returns {string[]} Array of plugin names
+ */
 function extractExistingPlugins(zshrcContent) {
     const pluginMatch = zshrcContent.match(/plugins=\(([^)]+)\)/);
     if (pluginMatch && pluginMatch[1]) {
@@ -21,8 +22,13 @@ function extractExistingPlugins(zshrcContent) {
     return [];
 }
 
-// Function to generate the .zshrc content based on selected plugins and theme
-export function generateZshrcContent(theme, plugins = []) {
+/**
+ * Generates complete .zshrc configuration
+ * @param {string} theme - Selected theme name
+ * @param {string[]} plugins - Array of plugin names
+ * @returns {Promise<string>} Generated .zshrc content
+ */
+export async function generateZshrcContent(theme, plugins = []) {
     // Ensure plugins array is not empty, and fall back to default plugins if necessary
     if (!Array.isArray(plugins) || plugins.length === 0) {
         plugins = ['git'];  // Default to 'git' if no plugins are selected
@@ -132,21 +138,56 @@ eval "\$(starship init zsh)"
 `;
     }
 
+    // Add system-specific optimizations
+    zshrcContent += generateSystemOptimizations();
+    
+    // Add terminal integration
+    const terminalIntegration = await setupTerminalIntegration();
+    if (terminalIntegration) {
+        zshrcContent += `
+# Terminal Integration
+${terminalIntegration}`;
+    }
+
     return zshrcContent;
 }
 
-// Function to update the .zshrc file with selected plugins and theme
-export function updateZshrc(newPlugins, theme) {
+/**
+ * Creates timestamped backup of existing .zshrc
+ * @param {string} zshrcPath - Path to .zshrc file
+ * @returns {string|null} Backup file path or null if no backup needed
+ */
+function backupExistingZshrc(zshrcPath) {
+    if (fs.existsSync(zshrcPath)) {
+        const backupPath = `${zshrcPath}.backup.${Date.now()}`;
+        fs.copyFileSync(zshrcPath, backupPath);
+        console.log(chalk.blue(`ℹ️ Existing .zshrc backed up to: ${backupPath}`));
+        return backupPath;
+    }
+    return null;
+}
+
+/**
+ * Updates .zshrc file with plugins and theme configuration
+ * @param {string[]} newPlugins - Array of plugin names
+ * @param {string} theme - Theme name to apply
+ */
+export async function updateZshrc(newPlugins, theme) {
     const zshrcPath = path.join(os.homedir(), '.zshrc');
 
     try {
+        // Backup existing .zshrc
+        backupExistingZshrc(zshrcPath);
+
         // Generate full .zshrc content with selected plugins and theme
-        const zshrcContent = generateZshrcContent(theme, newPlugins);
+        const zshrcContent = await generateZshrcContent(theme, newPlugins);
 
         // Write the updated content to the .zshrc file
         fs.writeFileSync(zshrcPath, zshrcContent, 'utf-8');
         console.log(chalk.green(`✅ .zshrc updated with selected plugins and theme: ${theme}`));
+        console.log(chalk.yellow(`⚠️ Please restart your terminal or run 'source ~/.zshrc' to apply changes.`));
     } catch (error) {
         console.error(chalk.red(`❌ Error updating .zshrc: ${error.message}`));
+        throw error;
     }
 }

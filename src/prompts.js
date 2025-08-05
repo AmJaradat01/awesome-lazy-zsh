@@ -1,19 +1,18 @@
 /**
- * @author Ali M. Jaradat
- * @email AmJaradat01@gmail.com
- * @since 1-Jan-2022
- * @version 1.0.0
- * @file This file handles user prompts and selections for Awesome-Lazy-Zsh.
- * It provides functions for gathering user input during the setup process.
- * @lastModified 4-Sep-2024
+ * User prompt utilities for interactive CLI
+ * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
 import prompts from 'prompts';
 
 /**
- * Generic function to prompt user selection
- * @param {Object} params - Contains the prompt type, name, message, and choices
- * @returns {String|Null} - The selected option or null if nothing is selected
+ * Generic user selection prompt
+ * @param {Object} params - Prompt configuration
+ * @param {string} params.type - Prompt type (select, multiselect, etc.)
+ * @param {string} params.name - Response property name
+ * @param {string} params.message - Prompt message
+ * @param {Array} params.choices - Available choices
+ * @returns {Promise<string|null>} Selected option or null
  */
 export async function getUserSelection({ type, name, message, choices }) {
     try {
@@ -37,8 +36,8 @@ export async function getUserSelection({ type, name, message, choices }) {
 }
 
 /**
- * Function to prompt user for the initial action
- * @returns {String|Null} - The selected action (freshInstallation, restoreBackup, defaultInstallation)
+ * Prompts user for initial setup action
+ * @returns {Promise<string|null>} Selected action type
  */
 export async function promptInitialAction() {
     try {
@@ -49,7 +48,10 @@ export async function promptInitialAction() {
             choices: [
                 { title: 'Start fresh installation', value: 'freshInstallation' },
                 { title: 'Default installation', value: 'defaultInstallation' },
-                { title: 'Restore/Backup', value: 'restoreBackup' }
+                { title: 'Restore/Backup', value: 'restoreBackup' },
+                { title: 'Update plugins', value: 'updatePlugins' },
+                { title: 'Manage profiles', value: 'manageProfiles' },
+                { title: 'Add custom plugin', value: 'addCustomPlugin' }
             ]
         });
 
