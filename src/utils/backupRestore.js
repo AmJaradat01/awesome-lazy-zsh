@@ -39,7 +39,6 @@ export function backupZshrc() {
         if (fs.existsSync(zshrcPath)) {
             const zshrcContent = fs.readFileSync(zshrcPath, 'utf8');
             fs.writeFileSync(backupPath, zshrcContent, 'utf8');
-            console.log(`✅ Backup created at: ${backupPath}`);
             
             // Verify backup was created successfully
             const backupContent = fs.readFileSync(backupPath, 'utf8');
@@ -48,6 +47,8 @@ export function backupZshrc() {
             } else {
                 console.log(`✅ Backup verified: ${backupContent.length} characters`);
             }
+            
+            console.log(`✅ Backup created at: ${backupPath}`);
         } else {
             console.log('❌ No .zshrc file found to backup.');
         }
