@@ -15,7 +15,10 @@ export function runCommand(command) {
     return new Promise((resolve) => {
         try {
             console.log(chalk.blue(`🚀 Running: ${command}`));
-            execSync(command, { stdio: 'inherit' });
+            execSync(command, { 
+                stdio: 'inherit',
+                timeout: 60000 // 60 second timeout
+            });
             console.log(chalk.green(`✅ Command executed successfully`));
             resolve(true);
         } catch (error) {

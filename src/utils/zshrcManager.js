@@ -160,7 +160,8 @@ ${terminalIntegration}`;
 function backupExistingZshrc(zshrcPath) {
     if (fs.existsSync(zshrcPath)) {
         const backupPath = `${zshrcPath}.backup.${Date.now()}`;
-        fs.copyFileSync(zshrcPath, backupPath);
+        const zshrcContent = fs.readFileSync(zshrcPath, 'utf8');
+        fs.writeFileSync(backupPath, zshrcContent, 'utf8');
         console.log(chalk.blue(`ℹ️ Existing .zshrc backed up to: ${backupPath}`));
         return backupPath;
     }

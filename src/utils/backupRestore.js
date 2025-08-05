@@ -91,7 +91,8 @@ export async function restoreZshrc() {
         if (confirmRestore) {
             try {
                 const zshrcPath = path.join(os.homedir(), '.zshrc');
-                fs.copyFileSync(selectedBackup, zshrcPath);
+                const backupContent = fs.readFileSync(selectedBackup, 'utf8');
+                fs.writeFileSync(zshrcPath, backupContent, 'utf8');
                 console.log(`✅ .zshrc restored from backup: ${selectedBackup}`);
             } catch (error) {
                 console.error(`❌ Error during restoration: ${error.message}`);
