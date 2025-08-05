@@ -47,4 +47,4 @@ if [[ " ${plugins[@]} " =~ " npm " ]]; then
     alias nb='npm run build'
 fi
 
-echo "🚀 Awesome-Lazy-Zsh aliases loaded!"
+# Aliases loaded silently
