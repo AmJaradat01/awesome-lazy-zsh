@@ -37,7 +37,17 @@ export function backupZshrc() {
 
     try {
         if (fs.existsSync(zshrcPath)) {
-            fs.copyFileSync(zshrcPath, backupPath);
+            const zshrcContent = fs.readFileSync(zshrcPath, 'utf8');
+            fs.writeFileSync(backupPath, zshrcContent, 'utf8');
+            
+            // Verify backup was created successfully
+            const backupContent = fs.readFileSync(backupPath, 'utf8');
+            if (backupContent.length === 0) {
+                console.error('❌ Warning: Backup file is empty!');
+            } else {
+                console.log(`✅ Backup verified: ${backupContent.length} characters`);
+            }
+            
             console.log(`✅ Backup created at: ${backupPath}`);
         } else {
             console.log('❌ No .zshrc file found to backup.');
@@ -81,7 +91,8 @@ export async function restoreZshrc() {
         if (confirmRestore) {
             try {
                 const zshrcPath = path.join(os.homedir(), '.zshrc');
-                fs.copyFileSync(selectedBackup, zshrcPath);
+                const backupContent = fs.readFileSync(selectedBackup, 'utf8');
+                fs.writeFileSync(zshrcPath, backupContent, 'utf8');
                 console.log(`✅ .zshrc restored from backup: ${selectedBackup}`);
             } catch (error) {
                 console.error(`❌ Error during restoration: ${error.message}`);
