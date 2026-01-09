@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author: Ali M. Jaradat
 # Since: 1-Jan-2022
-# Version: 3.1.1
+# Version: 3.1.2
 # Description: Comprehensive Zsh environment setup with plugin management, themes, and profiles.
 #              Installs dependencies (Git, Node.js, Homebrew, fzf) and provides interactive CLI
 #              for plugin updates, profile switching, and custom plugin installation.
@@ -233,7 +233,7 @@ install_node() {
 
 confirm_install() {
     echo
-    echo "🚀 Awesome-Lazy-Zsh v3.1.1 Setup"
+    echo "🚀 Awesome-Lazy-Zsh v3.1.2 Setup"
     echo "This setup will install dependencies and provide:"
     echo "- Git, Node.js, Homebrew, fzf (if not installed)"
     echo "- Plugin management (40+ plugins with updates)"
