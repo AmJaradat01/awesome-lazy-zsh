@@ -180,13 +180,65 @@ function backupExistingZshrc(zshrcPath) {
  */
 export async function updateZshrc(newPlugins, theme) {
     const zshrcPath = path.join(os.homedir(), '.zshrc');
+    const aliasDir = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'aliases');
 
     try {
         // Backup existing .zshrc
         backupExistingZshrc(zshrcPath);
 
         // Generate full .zshrc content with selected plugins and theme
-        const zshrcContent = await generateZshrcContent(theme, newPlugins);
+        let zshrcContent = await generateZshrcContent(theme, newPlugins);
+
+        // Add alias file sourcing for selected plugins
+        const aliasMapping = {
+            'mongodb': 'mongodb.zsh',
+            'postgresql': 'postgresql.zsh',
+            'mysql': 'mysql.zsh',
+            'redis': 'redis.zsh',
+            'rabbitmq': 'rabbitmq.zsh',
+            'elasticsearch': 'elasticsearch.zsh',
+            'memcached': 'memcached.zsh',
+            'aws': 'aws.zsh',
+            'gcloud': 'gcloud.zsh',
+            'azure': 'azure.zsh',
+            'kubernetes': 'kubernetes.zsh',
+            'docker-compose-extended': 'docker-compose.zsh',
+            'terraform-extended': 'terraform.zsh',
+            'ansible': 'ansible.zsh',
+            'python': 'python.zsh',
+            'golang': 'golang.zsh',
+            'rust': 'rust.zsh',
+            'node': 'node.zsh',
+            'java': 'java.zsh',
+            'git-extras': 'git-extras.zsh',
+            'ssh': 'ssh.zsh',
+            'dotenv': 'dotenv.zsh',
+            'directories': 'directories.zsh',
+            'history-search': 'history.zsh',
+            'extract': 'extract.zsh'
+        };
+
+        // Add custom aliases section
+        let aliasSection = '\n# Awesome-Lazy-Zsh Custom Aliases\n';
+        for (const plugin of newPlugins) {
+            if (aliasMapping[plugin]) {
+                const aliasFile = path.join(aliasDir, aliasMapping[plugin]);
+                if (fs.existsSync(aliasFile)) {
+                    aliasSection += `[ -f "${aliasFile}" ] && source "${aliasFile}"\n`;
+                }
+            }
+        }
+        
+        // Always source services.zsh if any service plugin is selected
+        const servicePlugins = ['mongodb', 'postgresql', 'mysql', 'redis', 'rabbitmq', 'elasticsearch', 'memcached'];
+        if (newPlugins.some(p => servicePlugins.includes(p))) {
+            const servicesFile = path.join(aliasDir, 'services.zsh');
+            if (fs.existsSync(servicesFile)) {
+                aliasSection = `[ -f "${servicesFile}" ] && source "${servicesFile}"\n` + aliasSection;
+            }
+        }
+
+        zshrcContent += aliasSection;
 
         // Write the updated content to the .zshrc file
         fs.writeFileSync(zshrcPath, zshrcContent, 'utf-8');
