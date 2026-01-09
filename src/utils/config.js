@@ -5,22 +5,59 @@
 
 /** Plugin repository mappings - empty string indicates built-in Oh My Zsh plugin */
 export const pluginRepos = {
-    'git': '', // Built-in Oh My Zsh plugin
-    'azure': '', // Azure CLI aliases
-    'git-flow': '', // Built-in Oh My Zsh plugin
-    'npm': '', // Built-in Oh My Zsh plugin
-    'nvm': '', // Built-in Oh My Zsh plugin
-    'docker': '', // Built-in Oh My Zsh plugin
-    'docker-compose': '', // Built-in Oh My Zsh plugin
-    'kubectl': '', // Built-in Oh My Zsh plugin
-    'terraform': '', // Built-in Oh My Zsh plugin
-    'vscode': '', // Built-in Oh My Zsh plugin
+    // Built-in Oh My Zsh plugins
+    'git': '',
+    'git-flow': '',
+    'npm': '',
+    'nvm': '',
+    'docker': '',
+    'docker-compose': '',
+    'kubectl': '',
+    'terraform': '',
+    'vscode': '',
+    
+    // External plugins
     'fzf': 'https://github.com/junegunn/fzf.git',
     'z': 'https://github.com/agkozak/zsh-z.git',
     'thefuck': 'https://github.com/nvbn/thefuck.git',
     'zsh-autocomplete': 'https://github.com/marlonrichert/zsh-autocomplete.git',
     'zsh-autosuggestions': 'https://github.com/zsh-users/zsh-autosuggestions.git',
-    'zsh-syntax-highlighting': 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
+    'zsh-syntax-highlighting': 'https://github.com/zsh-users/zsh-syntax-highlighting.git',
+    
+    // Database services
+    'mongodb': '',
+    'postgresql': '',
+    'mysql': '',
+    'redis': '',
+    'rabbitmq': '',
+    'elasticsearch': '',
+    'memcached': '',
+    
+    // Cloud providers
+    'aws': '',
+    'gcloud': '',
+    'azure': '',
+    
+    // DevOps tools
+    'kubernetes': '',
+    'docker-compose-extended': '',
+    'terraform-extended': '',
+    'ansible': '',
+    
+    // Development languages
+    'python': '',
+    'golang': '',
+    'rust': '',
+    'node': '',
+    'java': '',
+    
+    // Productivity
+    'git-extras': '',
+    'ssh': '',
+    'dotenv': '',
+    'directories': '',
+    'history-search': '',
+    'extract': ''
 };
 
 /** Theme repository mappings - empty string indicates built-in Oh My Zsh theme */
