@@ -6,7 +6,7 @@
 /** Plugin repository mappings - empty string indicates built-in Oh My Zsh plugin */
 export const pluginRepos = {
     'git': '', // Built-in Oh My Zsh plugin
-    'docker-compose-extended': '', // Docker Compose extended aliases
+    'terraform-extended': '', // Terraform extended aliases
     'git-flow': '', // Built-in Oh My Zsh plugin
     'npm': '', // Built-in Oh My Zsh plugin
     'nvm': '', // Built-in Oh My Zsh plugin
