@@ -1,10 +1,10 @@
 class AwesomeLazyZsh < Formula
   desc "Comprehensive Zsh environment manager with plugins, themes, and profiles"
   homepage "https://github.com/AmJaradat01/awesome-lazy-zsh"
-  url "https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/v3.1.1.tar.gz"
+  url "https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/v3.1.2.tar.gz"
   sha256 "PLACEHOLDER_SHA256"
   license "MIT"
-  version "3.1.1"
+  version "3.1.2"
 
   depends_on "git"
   depends_on "node"
