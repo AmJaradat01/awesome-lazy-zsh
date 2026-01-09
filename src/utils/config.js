@@ -6,6 +6,7 @@
 /** Plugin repository mappings - empty string indicates built-in Oh My Zsh plugin */
 export const pluginRepos = {
     'git': '', // Built-in Oh My Zsh plugin
+    'azure': '', // Azure CLI aliases
     'git-flow': '', // Built-in Oh My Zsh plugin
     'npm': '', // Built-in Oh My Zsh plugin
     'nvm': '', // Built-in Oh My Zsh plugin
