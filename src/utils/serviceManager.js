@@ -38,6 +38,13 @@ export const services = {
         brew: 'redis',
         apt: 'redis-server',
         choco: 'redis-64'
+    },
+    'rabbitmq': { 
+        name: 'RabbitMQ', 
+        port: 5672,
+        brew: 'rabbitmq',
+        apt: 'rabbitmq-server',
+        choco: 'rabbitmq'
     }
 };
 
@@ -51,7 +58,7 @@ function getPackageName(serviceName) {
 }
 
 function getSystemdName(serviceName) {
-    const map = { mongodb: 'mongod', postgresql: 'postgresql', mysql: 'mysql', redis: 'redis-server' };
+    const map = { mongodb: 'mongod', postgresql: 'postgresql', mysql: 'mysql', redis: 'redis-server', rabbitmq: 'rabbitmq-server' };
     return map[serviceName] || serviceName;
 }
 
