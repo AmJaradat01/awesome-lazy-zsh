@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.1] - 2026-01-09
+
+### Fixed
+- **Alias Integration**: Fixed alias files not being sourced in .zshrc
+- **Plugin Loading**: Ensure services.zsh loads for database plugins
+
+## [3.1.0] - 2026-01-09
+
+### Added
+- **Database Services** (Cross-platform: macOS/Linux/Windows)
+  - MongoDB Community (`mongo-start`, `mongo-stop`, `mongo-local`)
+  - PostgreSQL (`pg-start`, `pg-stop`, `pg-local`, `pg-list`)
+  - MySQL (`mysql-start`, `mysql-stop`, `mysql-local`)
+  - Redis (`redis-start`, `redis-stop`, `redis-ping`)
+  - RabbitMQ (`rabbitmq-start`, `rabbitmq-queues`)
+  - Elasticsearch (`es-start`, `es-health`, `es-indices`)
+  - Memcached (`memcached-start`, `mc-stats`)
+
+- **Cloud CLI Tools**
+  - AWS CLI (`aws-whoami`, `aws-profile`, `ec2-list`, `s3-ls`)
+  - Google Cloud (`gc-auth`, `gc-vms`, `gc-buckets`)
+  - Azure CLI (`az-login`, `az-vms`, `az-aks`)
+
+- **DevOps Tools**
+  - Kubernetes (`kgp`, `kgs`, `kctx`, `kns`, `klogs`)
+  - Docker Compose Extended (`dcu`, `dcd`, `dcl`, `dcps`)
+  - Terraform Extended (`tfi`, `tfp`, `tfa`, `tfw`)
+  - Ansible (`ap`, `av`, `ag`, `aping`)
+
+- **Development Languages**
+  - Python/venv (`venv-create`, `va`, `vd`, `pip-freeze`)
+  - Golang (`gob`, `gor`, `got`, `gomod`)
+  - Rust/Cargo (`cb`, `cr`, `ct`, `cf`)
+  - Node/NPM/Yarn/PNPM (`ni`, `nr`, `yi`, `pi`)
+  - Java/Maven/Gradle (`mci`, `gwb`, `java11`, `java17`)
+
+- **Productivity Tools**
+  - Git Extras (`gst`, `grbi`, `gcp`, `gundo`, `gsync`)
+  - SSH Manager (`ssh-keygen-ed`, `ssh-copy-key`, `ssh-agent-start`)
+  - Dotenv Loader (`dotenv`, `env-load`, `env-show`)
+  - Directory Shortcuts (`..`, `...`, `mkcd`, `bookmark`, `goto`)
+  - History Search (`hg`, `fh`, `htop10`)
+  - Extract Plugin (`extract`, `mktar`, `mkzip`)
+
+- **Service Manager Framework**: Cross-platform service management (Homebrew/systemd/Windows)
+
+### Changed
+- Updated README with complete plugin documentation
+- Reorganized config.js with categorized plugins
+
 ## [3.0.0] - 2024-12-19
 
 ### Added

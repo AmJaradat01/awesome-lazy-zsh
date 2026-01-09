@@ -16,7 +16,8 @@ import fs from 'fs';
 const defaultPlugins = [
     'git', 'git-flow', 'npm', 'nvm', 'docker', 'docker-compose',
     'kubectl', 'terraform', 'vscode', 'fzf', 'z',
-    'zsh-autocomplete', 'zsh-autosuggestions', 'zsh-syntax-highlighting'
+    'zsh-autocomplete', 'zsh-autosuggestions', 'zsh-syntax-highlighting',
+    'git-extras', 'directories', 'history-search', 'extract'
 ];
 
 /**
