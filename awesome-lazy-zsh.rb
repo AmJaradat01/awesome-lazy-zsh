@@ -1,19 +1,17 @@
 class AwesomeLazyZsh < Formula
-  desc "Comprehensive Zsh environment manager with plugins, themes, and profiles"
+  desc "Comprehensive Zsh environment manager with 40+ plugins, themes, and profiles"
   homepage "https://github.com/AmJaradat01/awesome-lazy-zsh"
-  url "https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/v3.1.2.tar.gz"
-  sha256 "PLACEHOLDER_SHA256"
+  url "https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/v3.1.3.tar.gz"
+  sha256 "b4b6a5d08bf905f2c67aac71ec0db72d0d763b2259f6d915e1b23c47382b32bc"
   license "MIT"
-  version "3.1.2"
+  version "3.1.3"
 
   depends_on "git"
   depends_on "node"
 
   def install
-    # Install supporting files
     libexec.install Dir["*"]
 
-    # Create wrapper script that runs from the installed location
     (bin/"awesome-lazy-zsh").write <<~EOS
       #!/bin/bash
       cd "#{libexec}" && exec ./setup.sh "$@"
@@ -21,7 +19,6 @@ class AwesomeLazyZsh < Formula
   end
 
   test do
-    # Test that the script exists and is executable
     assert_path_exists bin/"awesome-lazy-zsh"
     assert_predicate bin/"awesome-lazy-zsh", :executable?
   end
