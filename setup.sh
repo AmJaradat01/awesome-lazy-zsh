@@ -137,8 +137,8 @@ secure_download() {
 get_homebrew_checksum() {
     # For security, we should verify the installer
     # Since Homebrew doesn't provide static checksums, we'll verify the source
-    log_warning "Homebrew installer will be downloaded from official source"
-    log_warning "Please verify the installer source manually if security is critical"
+    log_warning "Homebrew installer will be downloaded from official source" >&2
+    log_warning "Please verify the installer source manually if security is critical" >&2
     echo "skip"
 }
 
