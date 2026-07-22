@@ -14,6 +14,7 @@ import {
     startService,
     getStartCommands
 } from './serviceInstaller.js';
+import { writeState } from './stateManager.js';
 
 /**
  * @typedef {import('./serviceInstaller.js').InstallResult} InstallResult
@@ -143,6 +144,14 @@ export async function runServiceInstallation(selectedPlugins) {
 
     const selectedServices = servicesResponse.selectedServices;
 
+    // Save state checkpoint: service selection complete
+    writeState({
+        checkpoint: 'service_installation',
+        selectedServices: selectedServices,
+        pendingServices: [...selectedServices],
+        installedServices: []
+    });
+
     // Detect platform
     const platform = await detectPlatform();
 
@@ -153,6 +162,8 @@ export async function runServiceInstallation(selectedPlugins) {
 
     // Install each selected service
     const results = [];
+    const installedServices = [];
+    const pendingServices = [...selectedServices];
 
     for (const serviceKey of selectedServices) {
         const service = serviceRegistry[serviceKey];
@@ -166,9 +177,27 @@ export async function runServiceInstallation(selectedPlugins) {
                 skipped: true,
                 message: `${service.displayName} is already installed.`
             });
+            // Move from pending to installed
+            const idx = pendingServices.indexOf(serviceKey);
+            if (idx !== -1) pendingServices.splice(idx, 1);
+            installedServices.push(serviceKey);
+            writeState({
+                pendingServices: [...pendingServices],
+                installedServices: [...installedServices]
+            });
         } else {
             const result = await installService(serviceKey, platform);
             results.push(result);
+            if (result.success) {
+                // Move from pending to installed
+                const idx = pendingServices.indexOf(serviceKey);
+                if (idx !== -1) pendingServices.splice(idx, 1);
+                installedServices.push(serviceKey);
+                writeState({
+                    pendingServices: [...pendingServices],
+                    installedServices: [...installedServices]
+                });
+            }
         }
     }
 

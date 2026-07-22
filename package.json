@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "setup": "bash setup.sh",
-    "test": "node --test"
+    "test": "node --test --test-concurrency=1"
   },
   "keywords": [
     "zsh setup",
