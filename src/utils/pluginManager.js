@@ -33,6 +33,11 @@ async function installPlugin(pluginName) {
         return true;
     }
 
+    if (repoUrl === 'alias-only') {
+        console.log(chalk.blue(`ℹ️ ${pluginName} will be loaded as a custom alias file.`));
+        return true;
+    }
+
     const pluginPath = path.join(os.homedir(), `.oh-my-zsh/custom/plugins/${pluginName}`);
 
     if (fs.existsSync(pluginPath)) {

@@ -8,6 +8,7 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import { generateSystemOptimizations, setupTerminalIntegration } from './systemIntegration.js';
+import { pluginRepos } from './config.js';
 
 /**
  * Extracts plugin list from existing .zshrc content
@@ -34,6 +35,12 @@ export async function generateZshrcContent(theme, plugins = []) {
         plugins = ['git'];  // Default to 'git' if no plugins are selected
     }
 
+    // Only include real Oh My Zsh plugins (built-in + external), not alias-only ones
+    const omzPlugins = plugins.filter(p => {
+        const repo = pluginRepos[p];
+        return repo !== 'alias-only';
+    });
+
     let zshrcContent = `
 # ==============================
 #  Awesome-Lazy-Zsh Configuration
@@ -54,7 +61,7 @@ export ZSH="\$HOME/.oh-my-zsh"
 ZSH_THEME="${theme}"
 
 # Plugins
-plugins=(${plugins.join(' ')})
+plugins=(${omzPlugins.join(' ')})
 
 source \$ZSH/oh-my-zsh.sh
 
