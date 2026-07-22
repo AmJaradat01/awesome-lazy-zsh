@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "setup": "bash setup.sh"
+    "setup": "bash setup.sh",
+    "test": "node --test"
   },
   "keywords": [
     "zsh setup",
@@ -26,6 +27,9 @@
   "homepage": "https://github.com/AmJaradat01/awesome-lazy-zsh",
   "bugs": {
     "url": "https://github.com/AmJaradat01/awesome-lazy-zsh/issues"
+  },
+  "devDependencies": {
+    "fast-check": "^3.22.0"
   },
   "dependencies": {
     "chalk": "^5.3.0",
