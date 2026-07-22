@@ -6,6 +6,7 @@
 import { getUserSelection } from '../prompts.js';
 import { runCommand } from './commands.js';
 import { updateZshrc } from './zshrcManager.js';
+import { runServiceInstallation } from './serviceInstallFlow.js';
 import { pluginRepos } from './config.js';
 import chalk from 'chalk';
 import path from 'path';
@@ -106,6 +107,14 @@ export async function runFreshInstallation() {
 
         // Pass the successfully installed plugins to the .zshrc updater
         await updateZshrc(installedPlugins, 'spaceship');
+
+        // Offer to install actual service servers
+        try {
+            await runServiceInstallation(installedPlugins);
+        } catch (error) {
+            console.log(chalk.yellow(`⚠️ Service installation step failed: ${error.message}`));
+        }
+
         return installedPlugins;
     } catch (error) {
         console.error(chalk.red('❌ Error during plugin installation process:'), error);
@@ -144,6 +153,14 @@ export async function runDefaultInstallation() {
 
         // Update .zshrc with the successfully installed plugins and theme
         await updateZshrc(installedPlugins, 'spaceship');
+
+        // Offer to install actual service servers
+        try {
+            await runServiceInstallation(installedPlugins);
+        } catch (error) {
+            console.log(chalk.yellow(`⚠️ Service installation step failed: ${error.message}`));
+        }
+
         console.log(chalk.green('✅ Default plugins installation completed.'));
         return installedPlugins;
     } catch (error) {
