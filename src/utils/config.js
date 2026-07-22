@@ -3,7 +3,12 @@
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-/** Plugin repository mappings - empty string indicates built-in Oh My Zsh plugin */
+/**
+ * Plugin repository mappings
+ * - empty string '' indicates a built-in Oh My Zsh plugin (added to plugins=() array)
+ * - 'alias-only' indicates a custom alias plugin (sourced as a file, NOT added to plugins=())
+ * - URL string indicates an external plugin to clone
+ */
 export const pluginRepos = {
     // Built-in Oh My Zsh plugins
     'git': '',
@@ -15,8 +20,13 @@ export const pluginRepos = {
     'kubectl': '',
     'terraform': '',
     'vscode': '',
+    'extract': '',
+    'dotenv': '',
+    'ssh-agent': '',
+    'node': '',
+    'gitfast': '',
     
-    // External plugins
+    // External plugins (cloned into custom/plugins/)
     'fzf': 'https://github.com/junegunn/fzf.git',
     'z': 'https://github.com/agkozak/zsh-z.git',
     'thefuck': 'https://github.com/nvbn/thefuck.git',
@@ -24,40 +34,29 @@ export const pluginRepos = {
     'zsh-autosuggestions': 'https://github.com/zsh-users/zsh-autosuggestions.git',
     'zsh-syntax-highlighting': 'https://github.com/zsh-users/zsh-syntax-highlighting.git',
     
-    // Database services
-    'mongodb': '',
-    'postgresql': '',
-    'mysql': '',
-    'redis': '',
-    'rabbitmq': '',
-    'elasticsearch': '',
-    'memcached': '',
-    
-    // Cloud providers
-    'aws': '',
-    'gcloud': '',
-    'azure': '',
-    
-    // DevOps tools
-    'kubernetes': '',
-    'docker-compose-extended': '',
-    'terraform-extended': '',
-    'ansible': '',
-    
-    // Development languages
-    'python': '',
-    'golang': '',
-    'rust': '',
-    'node': '',
-    'java': '',
-    
-    // Productivity
-    'git-extras': '',
-    'ssh': '',
-    'dotenv': '',
-    'directories': '',
-    'history-search': '',
-    'extract': ''
+    // Alias-only plugins (sourced as custom alias files, not Oh My Zsh plugins)
+    'mongodb': 'alias-only',
+    'postgresql': 'alias-only',
+    'mysql': 'alias-only',
+    'redis': 'alias-only',
+    'rabbitmq': 'alias-only',
+    'elasticsearch': 'alias-only',
+    'memcached': 'alias-only',
+    'aws': 'alias-only',
+    'gcloud': 'alias-only',
+    'azure': 'alias-only',
+    'kubernetes': 'alias-only',
+    'docker-compose-extended': 'alias-only',
+    'terraform-extended': 'alias-only',
+    'ansible': 'alias-only',
+    'python': 'alias-only',
+    'golang': 'alias-only',
+    'rust': 'alias-only',
+    'java': 'alias-only',
+    'git-extras': 'alias-only',
+    'ssh': 'alias-only',
+    'directories': 'alias-only',
+    'history-search': 'alias-only'
 };
 
 /** Theme repository mappings - empty string indicates built-in Oh My Zsh theme */
