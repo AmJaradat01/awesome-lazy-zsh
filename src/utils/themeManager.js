@@ -36,6 +36,13 @@ async function installTheme(themeName) {
         const success = await runCommand(`git clone ${repoUrl} ${themePath}`);
         
         if (success && fs.existsSync(themePath)) {
+            // Create symlink for Oh My Zsh to find the theme
+            // Oh My Zsh looks for custom/themes/<name>.zsh-theme
+            const themeFile = `${themePath}/${themeName}.zsh-theme`;
+            const symlinkPath = `${os.homedir()}/.oh-my-zsh/custom/themes/${themeName}.zsh-theme`;
+            if (fs.existsSync(themeFile) && !fs.existsSync(symlinkPath)) {
+                fs.symlinkSync(themeFile, symlinkPath);
+            }
             console.log(chalk.green(`✅ ${themeName} theme installed successfully.`));
             return true;
         } else {
