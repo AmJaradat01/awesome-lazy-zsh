@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0] - 2026-07-22
+
+### Added
+- **Resume Setup** - Checkpoint-based state persistence for interrupted setups
+  - Automatically saves progress at each major step (plugin selection, plugin installation, service installation, theme selection)
+  - Detects incomplete state on re-launch and offers "Resume previous setup" or "Start fresh"
+  - Resumes from exact point of interruption — only installs remaining plugins/services
+  - Per-plugin progress tracking during installation (never re-installs what already succeeded)
+  - 24-hour staleness expiry — expired state files are auto-discarded
+  - Schema-versioned state file at `~/.awesome-lazy-zsh-state.json`
+  - Graceful degradation — state I/O failures never crash the setup flow
+  - Ctrl+C on resume prompt exits without modifying saved state
+- **New module**: `stateManager` — state file read/write/validate/expire utilities
+
 ## [3.2.1] - 2026-07-22
 
 ### Added
