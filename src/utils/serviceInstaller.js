@@ -126,11 +126,23 @@ export function getStartCommands(serviceKey, platform) {
         return [];
     }
 
+    // CLI tools and languages don't have services to start
+    if (!service.systemdUnit && platform.os === 'linux') {
+        return [];
+    }
+
     if (platform.os === 'macos') {
+        // Only services with ports have brew services (not CLI tools)
+        if (service.port === 0) {
+            return [];
+        }
         return [`brew services start ${service.brew.package}`];
     }
 
     if (platform.os === 'linux') {
+        if (!service.systemdUnit) {
+            return [];
+        }
         return [
             `sudo systemctl start ${service.systemdUnit}`,
             `sudo systemctl enable ${service.systemdUnit}`
@@ -151,7 +163,10 @@ export function generateSuccessMessage(serviceKey) {
     if (!service) {
         return '';
     }
-    return `${service.displayName} installed successfully on port ${service.port}.`;
+    if (service.port > 0) {
+        return `${service.displayName} installed successfully on port ${service.port}.`;
+    }
+    return `${service.displayName} installed successfully.`;
 }
 
 /**
