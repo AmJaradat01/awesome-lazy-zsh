@@ -1,6 +1,6 @@
 # Awesome Lazy Zsh
 
-[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v3.2.1-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v3.3.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 🚀 **The easiest way to set up and manage your Zsh environment**
 
@@ -15,7 +15,15 @@ Awesome-Lazy-Zsh is a powerful yet simple tool that automates your Zsh setup wit
 - 🖥️ **Interactive CLI** - Beautiful, user-friendly setup wizard
 - 🔧 **Auto Dependencies** - Installs Git, Node.js, Homebrew automatically
 
-### New in v3.2.0
+### New in v3.3.0
+- 🔄 **Resume Setup** - Never lose progress on interrupted setups again!
+  - Automatic checkpoint saving at each major step
+  - Resume or start fresh prompt on re-launch
+  - Per-plugin/service progress tracking
+  - 24-hour auto-expiry for stale state
+  - Graceful degradation — failures never crash the flow
+
+### Since v3.2.0
 - 📦 **Service Installation** - Actually install MongoDB, MySQL, PostgreSQL, Redis, RabbitMQ, Elasticsearch, Memcached (not just aliases!)
 - ☁️ **Cloud CLI Installation** - Install AWS CLI, Google Cloud SDK, Azure CLI
 - 🛠️ **DevOps Tool Installation** - Install kubectl, Terraform, Ansible, Docker Compose
