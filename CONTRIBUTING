@@ -1,61 +1,8 @@
 # Contributing to Awesome-Lazy-Zsh
 
-Thank you for your interest in contributing! This guide will help you get started with contributing to Awesome-Lazy-Zsh.
+Thank you for considering a contribution. This document covers how to set up the project locally, how we use git-flow, and how to submit changes.
 
-## 🚀 Quick Start
-
-1. Fork the repository
-2. Create a feature branch following git-flow
-3. Make your changes
-4. Submit a pull request
-
-## 🌊 Git Flow Workflow
-
-We follow **git-flow** branching model:
-
-### Branch Types
-- `main` - Production-ready code
-- `develop` - Integration branch for features
-- `feature/*` - New features
-- `release/*` - Release preparation
-- `hotfix/*` - Critical fixes
-
-### Creating Features
-```bash
-# Start from develop branch
-git checkout develop
-git pull origin develop
-
-# Create feature branch
-git checkout -b feature/your-feature-name
-
-# Work on your feature
-# ...
-
-# Push feature branch
-git push origin feature/your-feature-name
-```
-
-### Commit Messages
-Follow conventional commits:
-```
-type(scope): description
-
-feat(plugins): add custom plugin support
-fix(setup): resolve installation error
-docs(readme): update installation guide
-```
-
-## 🐛 Reporting Issues
-
-When reporting bugs, include:
-- Clear description
-- Steps to reproduce
-- Expected vs actual behavior
-- System information (OS, terminal, shell version)
-- Error messages/logs
-
-## 💻 Development Setup
+## Development Setup
 
 ```bash
 # Clone your fork
@@ -65,78 +12,165 @@ cd awesome-lazy-zsh
 # Install dependencies
 npm install
 
-# Test the setup
-./setup.sh
+# Run tests
+npm test
+
+# Check syntax without running
+node --check src/index.js
 ```
 
-## 🧪 Testing
+### Project Structure
 
-Before submitting:
-- Test on multiple systems (macOS/Linux)
-- Verify existing functionality works
-- Test edge cases and error scenarios
-- Run the setup script end-to-end
+```
+src/
+├── index.js              # Entry point, main flow orchestration
+├── prompts.js            # Interactive CLI prompts
+├── aliases/              # Zsh alias files (one per plugin category)
+└── utils/
+    ├── config.js         # Plugin/theme repository mappings
+    ├── stateManager.js   # Resume setup state persistence
+    ├── pluginManager.js  # Plugin selection and installation
+    ├── themeManager.js   # Theme selection and application
+    ├── serviceInstallFlow.js  # Service installation orchestration
+    ├── serviceInstaller.js    # Platform-specific install commands
+    ├── serviceRegistry.js     # Service metadata and binary mappings
+    ├── platformDetector.js    # OS and package manager detection
+    ├── zshrcManager.js        # .zshrc file generation
+    ├── backupRestore.js       # Backup/restore functionality
+    ├── profileManager.js      # Configuration profiles
+    ├── updateManager.js       # Plugin update logic
+    ├── customPlugins.js       # Custom plugin installation
+    ├── commands.js            # Shell command execution
+    └── systemIntegration.js   # OS-specific optimizations
+tests/
+├── *.test.js             # Unit tests (node:test)
+└── *.property.test.js    # Property-based tests (fast-check)
+```
 
-## 📝 Code Standards
+### Tech Stack
 
-- Use meaningful names for variables/functions
-- Add JSDoc comments for functions
-- Follow existing code style
-- Handle errors gracefully
-- Add appropriate logging
+- **Runtime**: Node.js (ES modules)
+- **Dependencies**: `chalk` (styling), `prompts` (interactive input)
+- **Test runner**: `node --test` (built-in)
+- **Property testing**: `fast-check`
+- **Shell**: Bash (`setup.sh`), Zsh (alias files)
 
-## 🎯 Areas for Contribution
+## Git Flow Workflow
 
-- **New Plugins**: Add support for popular development tools
-- **Themes**: Integrate new Zsh themes
-- **System Support**: Improve compatibility
-- **Documentation**: Enhance guides and examples
-- **Bug Fixes**: Resolve reported issues
-- **Performance**: Optimize installation speed
+We use git-flow. All feature work starts from `develop` and merges back into it.
 
-## 📋 Pull Request Process
+### Branches
 
-1. **Target Branch**: Submit PRs to `develop` branch
-2. **Description**: Clearly describe changes and motivation
-3. **Testing**: Include test results
-4. **Documentation**: Update relevant docs
-5. **Review**: Address feedback promptly
+| Branch | Purpose |
+|--------|---------|
+| `master` | Production releases (tagged) |
+| `develop` | Integration branch for next release |
+| `feature/*` | New features |
+| `release/*` | Release preparation |
+| `hotfix/*` | Critical production fixes |
 
-### PR Template
-```markdown
-## Changes
-- Brief description of changes
+### Working on a Feature
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-feature-name
+
+# Make changes, commit, push
+git push -u origin feature/your-feature-name
+```
+
+Then open a pull request targeting `develop`.
+
+### Commit Messages
+
+Use conventional commits:
+
+```
+feat(plugins): add redis cluster aliases
+fix(resume): handle corrupted state file gracefully
+docs(readme): update plugin count
+test(stateManager): add expiry boundary tests
+chore(ci): update homebrew workflow
+```
 
 ## Testing
-- [ ] Tested on macOS
-- [ ] Tested on Linux
-- [ ] Existing functionality works
 
-## Documentation
-- [ ] Updated README if needed
-- [ ] Updated CHANGELOG
+Run the full test suite before submitting:
+
+```bash
+npm test
 ```
 
-## 🏷️ Release Process
+Tests run serially (`--test-concurrency=1`) because some tests share a state file path.
 
-Maintainers handle releases:
-1. Create `release/x.x.x` branch from `develop`
-2. Update version numbers and changelog
-3. Merge to `main` and tag
-4. Merge back to `develop`
+### Writing Tests
 
-## 🤝 Code of Conduct
+- Unit tests go in `tests/<module>.test.js`
+- Property-based tests go in `tests/<module>.property.test.js`
+- Use `node:test` and `node:assert/strict`
+- Property tests use `fast-check` with a minimum of 100 iterations
+- Tests that do file I/O should clean up in `beforeEach`/`afterEach`
 
-- Be respectful and inclusive
-- Provide constructive feedback
-- Help others learn and grow
+## Adding a New Plugin
+
+1. Add the entry to `src/utils/config.js`:
+   - Built-in Oh My Zsh plugin: `'plugin-name': ''`
+   - External plugin: `'plugin-name': 'https://github.com/...'`
+   - Alias-only plugin: `'plugin-name': 'alias-only'`
+
+2. If alias-only, create `src/aliases/plugin-name.zsh` with alias definitions.
+
+3. If the plugin maps to an installable service, add it to `src/utils/serviceRegistry.js`.
+
+4. Update the README plugin table.
+
+## Adding a New Theme
+
+1. Add the entry to `themeRepos` in `src/utils/config.js`:
+   - Built-in: `'theme-name': ''`
+   - External: `'theme-name': 'https://github.com/...'`
+
+2. Update the README theme table.
+
+## Pull Request Process
+
+1. Target the `develop` branch.
+2. Ensure `npm test` passes.
+3. Describe what changed and why.
+4. If adding a plugin or service, include the alias definitions and test coverage.
+5. Keep PRs focused — one feature or fix per PR.
+
+### PR Checklist
+
+- [ ] Tests pass (`npm test`)
+- [ ] No syntax errors (`node --check src/index.js`)
+- [ ] README updated if user-facing behavior changed
+- [ ] CHANGELOG updated with a brief entry
+- [ ] Commit messages follow conventional format
+
+## Reporting Issues
+
+Include:
+- Steps to reproduce
+- Expected vs actual behavior
+- OS, terminal emulator, and shell version
+- Error output or logs (`setup.log`)
+
+## Release Process
+
+Handled by maintainers:
+
+1. Create `release/vX.Y.Z` from `develop`
+2. Bump version in `package.json`
+3. Update CHANGELOG
+4. Merge into `master`, tag, merge back into `develop`
+5. Create GitHub release (triggers Homebrew formula update automatically)
+
+## Code of Conduct
+
+- Be respectful and constructive
 - Focus on the code, not the person
+- Help others learn
 
-## ❓ Questions?
-
-Feel free to:
-- Open an issue for questions
-- Start a discussion
-- Reach out to maintainers
-
-Thank you for contributing! 🎉
+Thank you for contributing.

@@ -1,44 +1,38 @@
 # Awesome Lazy Zsh
 
-[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v3.3.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Version](https://img.shields.io/badge/version-v3.3.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)
 
 🚀 **The easiest way to set up and manage your Zsh environment**
 
-Awesome-Lazy-Zsh is a powerful yet simple tool that automates your Zsh setup with plugins, themes, and configurations. Perfect for developers who want a beautiful, functional terminal without the hassle.
+Awesome-Lazy-Zsh automates your Zsh setup with 42 plugins, 5 themes, configuration profiles, and service installation. It installs dependencies, manages Oh My Zsh, and gives you a beautiful interactive CLI to build the terminal environment you want.
 
 ## ✨ Features
 
-### Core Features
-- 🔌 **Smart Plugin Management** - Install, update, and manage 40+ popular plugins
-- 🎨 **Theme Customization** - Choose from popular themes like Spaceship, Powerlevel10k
-- 💾 **Backup & Restore** - Automatic `.zshrc` backups before any changes
-- 🖥️ **Interactive CLI** - Beautiful, user-friendly setup wizard
-- 🔧 **Auto Dependencies** - Installs Git, Node.js, Homebrew automatically
+### Core
+- 🔌 **42 Plugins** — databases, cloud CLIs, DevOps tools, languages, and productivity shortcuts
+- 🎨 **5 Themes** — Spaceship, Powerlevel10k, Starship, Agnoster, Robbyrussell
+- 💾 **Backup & Restore** — automatic `.zshrc` backups before any changes
+- 🖥️ **Interactive CLI** — guided setup wizard with multi-select menus
+- 🔧 **Auto Dependencies** — installs Git, Node.js, Homebrew, fzf automatically
+- 📁 **Configuration Profiles** — save, switch, and manage different setups
+- 🌐 **Custom Plugins** — add plugins from any Git repository
 
-### New in v3.3.0
-- 🔄 **Resume Setup** - Never lose progress on interrupted setups again!
-  - Automatic checkpoint saving at each major step
-  - Resume or start fresh prompt on re-launch
-  - Per-plugin/service progress tracking
-  - 24-hour auto-expiry for stale state
-  - Graceful degradation — failures never crash the flow
+### Resume Setup (v3.3.0)
+- 🔄 **Never lose progress** — checkpoint-based state persistence
+- Automatic saves at each major step (plugin selection, installation, services, theme)
+- "Resume previous setup" or "Start fresh" prompt on re-launch
+- Per-plugin/service progress tracking — skips what already succeeded
+- 24-hour auto-expiry for stale state files
+- Graceful degradation — state I/O failures never crash the flow
 
-### Since v3.2.0
-- 📦 **Service Installation** - Actually install MongoDB, MySQL, PostgreSQL, Redis, RabbitMQ, Elasticsearch, Memcached (not just aliases!)
-- ☁️ **Cloud CLI Installation** - Install AWS CLI, Google Cloud SDK, Azure CLI
-- 🛠️ **DevOps Tool Installation** - Install kubectl, Terraform, Ansible, Docker Compose
-- 💻 **Language Runtime Installation** - Install Python, Go, Rust, Java (OpenJDK)
-- 🔍 **Platform Auto-Detection** - Automatically uses Homebrew (macOS), apt (Debian/Ubuntu), or yum (RHEL/CentOS)
-- ✅ **Pre-Installation Checks** - Skips already-installed tools
-- 🚀 **Post-Install Service Start** - Optionally start services immediately after installation
-
-### Since v3.1.0
-- 🗄️ **Database Services** - MongoDB, PostgreSQL, MySQL, Redis, RabbitMQ, Elasticsearch, Memcached
-- ☁️ **Cloud CLI Tools** - AWS, Google Cloud, Azure shortcuts
-- 🐳 **DevOps Tools** - Kubernetes, Docker Compose, Terraform, Ansible
-- 💻 **Language Support** - Python, Go, Rust, Node.js, Java
-- 🛠️ **Productivity** - Git extras, SSH manager, directory shortcuts, history search
-- 🌐 **Cross-Platform** - Full support for macOS, Linux, and Windows (WSL)
+### Service Installation (v3.2.0+)
+- 📦 Install real service servers (MongoDB, MySQL, PostgreSQL, Redis, RabbitMQ, Elasticsearch, Memcached)
+- ☁️ Install cloud CLIs (AWS CLI, Google Cloud SDK, Azure CLI)
+- 🛠️ Install DevOps tools (kubectl, Terraform, Ansible, Docker Compose)
+- 💻 Install language runtimes (Python, Go, Rust, Java/OpenJDK)
+- 🔍 Platform auto-detection — Homebrew (macOS), apt (Debian/Ubuntu), yum (RHEL/CentOS)
+- ✅ Pre-installation checks — skips already-installed tools
+- 🚀 Optionally start services immediately after installation
 
 ## 📋 Table of Contents
 
@@ -46,12 +40,15 @@ Awesome-Lazy-Zsh is a powerful yet simple tool that automates your Zsh setup wit
 - [Installation Options](#-installation-options)
 - [Available Plugins](#-available-plugins)
 - [Available Themes](#-available-themes)
+- [Resume Setup](#-resume-setup)
+- [Profile Management](#-profile-management)
 - [System Requirements](#-system-requirements)
 - [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🚀 Quick Start
 
-### Via Homebrew (Recommended) 🍺
+### Via Homebrew 🍺
 ```bash
 brew install amjaradat01/awesome-lazy-zsh/awesome-lazy-zsh
 awesome-lazy-zsh
@@ -59,163 +56,162 @@ awesome-lazy-zsh
 
 ### Via Git Clone
 ```bash
-git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git && cd awesome-lazy-zsh && ./setup.sh
+git clone https://github.com/AmJaradat01/awesome-lazy-zsh.git
+cd awesome-lazy-zsh
+./setup.sh
 ```
+
+The setup script installs Git, Node.js, Homebrew, and fzf if missing, then launches the interactive CLI.
 
 ## 🎛️ Installation Options
 
 | Option | Description |
 |--------|-------------|
-| 🆕 **Fresh Installation** | Choose your own plugins and themes |
-| ⚡ **Default Installation** | Pre-configured setup for developers |
-| 🔄 **Update Plugins** | Keep everything current |
-| 📁 **Manage Profiles** | Switch between configurations |
-| 🌐 **Custom Plugins** | Add plugins from any Git repository |
+| 🆕 **Fresh Installation** | Choose plugins and theme interactively |
+| ⚡ **Default Installation** | Pre-configured developer setup (18 plugins + Spaceship theme) |
+| 🔄 **Update Plugins** | Update all installed plugins to latest |
+| 📁 **Manage Profiles** | Save, switch, or list configuration profiles |
+| 🌐 **Custom Plugins** | Add any plugin from a Git repository URL |
+| 💾 **Backup/Restore** | Manage .zshrc backups |
+
+If a previous setup was interrupted, you'll also see a **Resume** option to continue from where you left off.
 
 ## 🔌 Available Plugins
 
 ### Database Services
-| Plugin | Description | Aliases |
-|--------|-------------|---------|
-| `mongodb` | MongoDB Community | `mongo-start`, `mongo-stop`, `mongo-local` |
-| `postgresql` | PostgreSQL Server | `pg-start`, `pg-stop`, `pg-local`, `pg-list` |
-| `mysql` | MySQL Server | `mysql-start`, `mysql-stop`, `mysql-local` |
-| `redis` | Redis Server | `redis-start`, `redis-stop`, `redis-ping` |
-| `rabbitmq` | RabbitMQ Server | `rabbitmq-start`, `rabbitmq-queues` |
-| `elasticsearch` | Elasticsearch | `es-start`, `es-health`, `es-indices` |
-| `memcached` | Memcached | `memcached-start`, `mc-stats` |
+| Plugin | Aliases |
+|--------|---------|
+| `mongodb` | `mongo-start`, `mongo-stop`, `mongo-local` |
+| `postgresql` | `pg-start`, `pg-stop`, `pg-local`, `pg-list` |
+| `mysql` | `mysql-start`, `mysql-stop`, `mysql-local` |
+| `redis` | `redis-start`, `redis-stop`, `redis-ping` |
+| `rabbitmq` | `rabbitmq-start`, `rabbitmq-queues` |
+| `elasticsearch` | `es-start`, `es-health`, `es-indices` |
+| `memcached` | `memcached-start`, `mc-stats` |
 
 ### Cloud Providers
-| Plugin | Description | Aliases |
-|--------|-------------|---------|
-| `aws` | AWS CLI | `aws-whoami`, `aws-profile`, `ec2-list`, `s3-ls` |
-| `gcloud` | Google Cloud | `gc-auth`, `gc-vms`, `gc-buckets` |
-| `azure` | Azure CLI | `az-login`, `az-vms`, `az-aks` |
+| Plugin | Aliases |
+|--------|---------|
+| `aws` | `aws-whoami`, `aws-profile`, `ec2-list`, `s3-ls` |
+| `gcloud` | `gc-auth`, `gc-vms`, `gc-buckets` |
+| `azure` | `az-login`, `az-vms`, `az-aks` |
 
 ### DevOps Tools
-| Plugin | Description | Aliases |
-|--------|-------------|---------|
-| `kubernetes` | Kubernetes/kubectl | `kgp`, `kgs`, `kctx`, `kns`, `klogs` |
-| `docker-compose-extended` | Docker Compose | `dcu`, `dcd`, `dcl`, `dcps` |
-| `terraform-extended` | Terraform | `tfi`, `tfp`, `tfa`, `tfw` |
-| `ansible` | Ansible | `ap`, `av`, `ag`, `aping` |
+| Plugin | Aliases |
+|--------|---------|
+| `kubernetes` | `kgp`, `kgs`, `kctx`, `kns`, `klogs` |
+| `docker-compose-extended` | `dcu`, `dcd`, `dcl`, `dcps` |
+| `terraform-extended` | `tfi`, `tfp`, `tfa`, `tfw` |
+| `ansible` | `ap`, `av`, `ag`, `aping` |
 
 ### Development Languages
-| Plugin | Description | Aliases |
-|--------|-------------|---------|
-| `python` | Python/venv | `venv-create`, `va`, `vd`, `pip-freeze` |
-| `golang` | Go | `gob`, `gor`, `got`, `gomod` |
-| `rust` | Rust/Cargo | `cb`, `cr`, `ct`, `cf` |
-| `node` | Node/NPM/Yarn | `ni`, `nr`, `yi`, `pi` |
-| `java` | Java/Maven/Gradle | `mci`, `gwb`, `java11`, `java17` |
+| Plugin | Aliases |
+|--------|---------|
+| `python` | `venv-create`, `va`, `vd`, `pip-freeze` |
+| `golang` | `gob`, `gor`, `got`, `gomod` |
+| `rust` | `cb`, `cr`, `ct`, `cf` |
+| `node` | `ni`, `nr`, `yi`, `pi` |
+| `java` | `mci`, `gwb`, `java11`, `java17` |
 
 ### Productivity
-| Plugin | Description | Aliases |
-|--------|-------------|---------|
-| `git-extras` | Extended Git | `gst`, `grbi`, `gcp`, `gundo`, `gsync` |
-| `ssh` | SSH Manager | `ssh-keygen-ed`, `ssh-copy-key`, `ssh-agent-start` |
-| `dotenv` | Dotenv Loader | `dotenv`, `env-load`, `env-show` |
-| `directories` | Directory Shortcuts | `..`, `...`, `mkcd`, `bookmark`, `goto` |
-| `history-search` | History Search | `hg`, `fh`, `htop10` |
-| `extract` | Archive Extraction | `extract`, `mktar`, `mkzip` |
+| Plugin | Aliases |
+|--------|---------|
+| `git-extras` | `gst`, `grbi`, `gcp`, `gundo`, `gsync` |
+| `ssh` | `ssh-keygen-ed`, `ssh-copy-key`, `ssh-agent-start` |
+| `dotenv` | `dotenv`, `env-load`, `env-show` |
+| `directories` | `..`, `...`, `mkcd`, `bookmark`, `goto` |
+| `history-search` | `hg`, `fh`, `htop10` |
+| `extract` | `extract`, `mktar`, `mkzip` |
 
 ### Built-in Oh My Zsh Plugins
-| Plugin | Description |
-|--------|-------------|
-| `git` | Git shortcuts and info |
-| `git-flow` | Git Flow workflow |
-| `docker` | Docker commands |
-| `docker-compose` | Docker Compose |
-| `kubectl` | Kubernetes CLI |
-| `terraform` | Terraform |
-| `nvm` | Node Version Manager |
-| `npm` | NPM shortcuts |
-| `vscode` | VS Code integration |
+`git` · `git-flow` · `npm` · `nvm` · `docker` · `docker-compose` · `kubectl` · `terraform` · `vscode` · `extract` · `dotenv` · `ssh-agent` · `node` · `gitfast`
 
 ### External Plugins
-| Plugin | Description |
-|--------|-------------|
-| `zsh-autosuggestions` | Command suggestions |
-| `zsh-syntax-highlighting` | Syntax highlighting |
-| `zsh-autocomplete` | Auto-completion |
-| `fzf` | Fuzzy finder |
+| Plugin | Source |
+|--------|--------|
+| `zsh-autosuggestions` | Fish-like command suggestions |
+| `zsh-syntax-highlighting` | Real-time syntax highlighting |
+| `zsh-autocomplete` | IDE-style auto-completion |
+| `fzf` | Fuzzy finder integration |
 | `z` | Smart directory jumping |
-| `thefuck` | Correct previous commands |
+| `thefuck` | Corrects previous console commands |
 
 ## 🎨 Available Themes
 
-| Theme | Description | Speed | Customization |
-|-------|-------------|-------|---------------|
-| `spaceship` | Modern, feature-rich | ⚡⚡⚡ | 🎨🎨🎨 |
-| `powerlevel10k` | Fastest, most customizable | ⚡⚡⚡⚡ | 🎨🎨🎨🎨 |
-| `starship` | Cross-shell, Rust-powered | ⚡⚡⚡⚡ | 🎨🎨🎨 |
-| `agnoster` | Clean, git-aware | ⚡⚡⚡ | 🎨🎨 |
-| `robbyrussell` | Simple, fast default | ⚡⚡⚡⚡ | 🎨 |
+| Theme | Type | Description |
+|-------|------|-------------|
+| `spaceship` | External | Modern, feature-rich prompt with git info |
+| `powerlevel10k` | External | Highly customizable, very fast |
+| `starship` | External | Cross-shell, written in Rust |
+| `agnoster` | Built-in | Clean, git-aware segments |
+| `robbyrussell` | Built-in | Simple and fast (Oh My Zsh default) |
 
-## 💻 System Requirements
+## 🔄 Resume Setup
 
-### Supported Systems
-- ✅ macOS (Intel & Apple Silicon)
-- ✅ Linux (Ubuntu, Debian, CentOS, Fedora, etc.)
-- ✅ Windows (WSL2, Git Bash, Cygwin)
+If your setup is interrupted (Ctrl+C, terminal crash, network issue), your progress is saved automatically. On re-launch, you'll see:
 
-### Cross-Platform Support
-All plugins automatically detect your OS and use the appropriate commands:
-- **macOS**: Homebrew services (`brew services`)
-- **Linux**: systemd (`systemctl`)
-- **Windows**: Native services (`net start/stop`)
+```
+? A previous setup was interrupted. What would you like to do?
+❯ Resume previous setup
+  Start fresh
+```
 
-### Auto-installed Dependencies
-- Git (for plugin management)
-- Node.js (for CLI interface)
-- Homebrew (macOS/Linux package manager)
-- Oh My Zsh (Zsh framework)
+Checkpoints are saved after:
+- Plugin selection
+- Each plugin installation
+- Service installation
+- Theme selection
 
-### Terminal Compatibility
-- ✅ iTerm2 (macOS)
-- ✅ Terminal.app (macOS)
-- ✅ GNOME Terminal (Linux)
-- ✅ Windows Terminal (Windows)
-- ✅ VS Code Terminal
-- ✅ Any Zsh-compatible terminal
+State is stored at `~/.awesome-lazy-zsh-state.json` and expires after 24 hours.
 
 ## 📁 Profile Management
 
-Save and switch between different configurations:
+Save and switch between different plugin/theme configurations:
 
-```bash
-# Save current setup as a profile
-./setup.sh → "Manage profiles" → "Save current as profile"
-
-# Switch between profiles
-./setup.sh → "Manage profiles" → "Switch profile"
+```
+? Profile management:
+❯ Switch profile
+  Save current as profile
+  List profiles
 ```
 
-**Example Profiles:**
-- **Work**: docker, kubernetes, aws, terraform
-- **Personal**: git, node, python, fzf
-- **Minimal**: git, z, zsh-autosuggestions
+Example setups:
+- **Work**: docker, kubernetes, aws, terraform, git-extras
+- **Personal**: git, node, python, fzf, z
+- **Minimal**: git, zsh-autosuggestions, z
+
+## 💻 System Requirements
+
+### Supported Platforms
+| Platform | Service Installation | Aliases |
+|----------|---------------------|---------|
+| macOS (Intel & Apple Silicon) | ✅ via Homebrew | ✅ |
+| Linux (Debian/Ubuntu) | ✅ via apt | ✅ |
+| Linux (RHEL/CentOS/Fedora) | ✅ via yum | ✅ |
+| Windows (WSL2) | ✅ via apt (inside WSL) | ✅ |
+
+Service installation requires macOS or Linux with a supported package manager. Aliases work on any system running Zsh.
+
+### Auto-installed Dependencies
+| Tool | Purpose |
+|------|---------|
+| Homebrew | Package manager (macOS/Linux) |
+| Git | Plugin management and cloning |
+| Node.js | Powers the interactive CLI |
+| fzf | Fuzzy finder functionality |
+| Oh My Zsh | Zsh plugin framework |
+
+### Terminal Compatibility
+Works in any terminal that supports Zsh: iTerm2, Terminal.app, GNOME Terminal, Windows Terminal (WSL), VS Code terminal, Alacritty, Kitty, WezTerm.
 
 ## 🤝 Contributing
 
-1. 🍴 Fork the repo
-2. 🌿 Create feature branch: `git checkout -b feature/amazing-feature`
-3. 💾 Commit changes: `git commit -m 'Add amazing feature'`
-4. 📤 Push branch: `git push origin feature/amazing-feature`
-5. 🔄 Open Pull Request
-
-**Ideas Welcome:**
-- New plugin integrations
-- Theme improvements
-- System compatibility
-- Documentation updates
+See [CONTRIBUTING](CONTRIBUTING) for details on development setup, git-flow workflow, and pull request guidelines.
 
 ## 📄 License
 
-MIT License - feel free to use in personal and commercial projects!
+[MIT License](LICENSE) — free to use in personal and commercial projects.
 
 ---
 
-**Made with ❤️ for developers who love beautiful, functional terminals**
-
-⭐ **Star this repo if it helped you!** ⭐
+**Made with ❤️ for developers who want a powerful terminal without the setup hassle**
