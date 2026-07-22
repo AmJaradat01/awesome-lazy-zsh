@@ -25,9 +25,15 @@ async function installTheme(themeName) {
     }
 
     const themePath = `${os.homedir()}/.oh-my-zsh/custom/themes/${themeName}`;
+    const themeFile = `${themePath}/${themeName}.zsh-theme`;
+    const symlinkPath = `${os.homedir()}/.oh-my-zsh/custom/themes/${themeName}.zsh-theme`;
     
     if (fs.existsSync(themePath)) {
         console.log(chalk.blue(`ℹ️ ${themeName} theme is already installed.`));
+        // Ensure symlink exists even if theme was installed by a previous version
+        if (fs.existsSync(themeFile) && !fs.existsSync(symlinkPath)) {
+            fs.symlinkSync(themeFile, symlinkPath);
+        }
         return true;
     }
 
@@ -38,8 +44,6 @@ async function installTheme(themeName) {
         if (success && fs.existsSync(themePath)) {
             // Create symlink for Oh My Zsh to find the theme
             // Oh My Zsh looks for custom/themes/<name>.zsh-theme
-            const themeFile = `${themePath}/${themeName}.zsh-theme`;
-            const symlinkPath = `${os.homedir()}/.oh-my-zsh/custom/themes/${themeName}.zsh-theme`;
             if (fs.existsSync(themeFile) && !fs.existsSync(symlinkPath)) {
                 fs.symlinkSync(themeFile, symlinkPath);
             }
