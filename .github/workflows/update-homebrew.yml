@@ -7,9 +7,11 @@ on:
 jobs:
   update-homebrew:
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Update Homebrew formula
-        uses: mislav/bump-homebrew-formula-action@v3.6
+        uses: mislav/bump-homebrew-formula-action@v3.2
         with:
           formula-name: awesome-lazy-zsh
           homebrew-tap: AmJaradat01/homebrew-awesome-lazy-zsh
