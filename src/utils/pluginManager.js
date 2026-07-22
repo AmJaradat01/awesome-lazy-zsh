@@ -8,6 +8,7 @@ import { runCommand } from './commands.js';
 import { updateZshrc } from './zshrcManager.js';
 import { runServiceInstallation } from './serviceInstallFlow.js';
 import { pluginRepos } from './config.js';
+import { writeState } from './stateManager.js';
 import chalk from 'chalk';
 import path from 'path';
 import os from 'os';
@@ -84,6 +85,18 @@ export async function runFreshInstallation() {
 
         console.log(chalk.bold.cyan('Selected plugins:'), plugins.join(', '));
 
+        // Save state checkpoint: plugin selection complete
+        writeState({
+            checkpoint: 'plugin_selection',
+            selectedPlugins: plugins,
+            pendingPlugins: plugins,
+            installedPlugins: [],
+            selectedServices: [],
+            installedServices: [],
+            pendingServices: [],
+            selectedTheme: null
+        });
+
         const installedPlugins = [];
         const failedPlugins = [];
 
@@ -91,6 +104,11 @@ export async function runFreshInstallation() {
             const success = await installPlugin(plugin);
             if (success) {
                 installedPlugins.push(plugin);
+                // Update state: move plugin from pending to installed
+                writeState({
+                    installedPlugins: [...installedPlugins],
+                    pendingPlugins: plugins.filter(p => !installedPlugins.includes(p) && !failedPlugins.includes(p))
+                });
             } else {
                 failedPlugins.push(plugin);
             }
@@ -104,6 +122,13 @@ export async function runFreshInstallation() {
             console.error(chalk.red('❌ No plugins were successfully installed.'));
             return null;
         }
+
+        // Save state checkpoint: all plugins installed
+        writeState({
+            checkpoint: 'plugin_installation',
+            installedPlugins: installedPlugins,
+            pendingPlugins: []
+        });
 
         // Pass the successfully installed plugins to the .zshrc updater
         await updateZshrc(installedPlugins, 'spaceship');

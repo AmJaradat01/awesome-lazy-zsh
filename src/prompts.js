@@ -36,6 +36,33 @@ export async function getUserSelection({ type, name, message, choices }) {
 }
 
 /**
+ * Prompts user to resume previous setup or start fresh
+ * @returns {Promise<'resume'|'fresh'|null>} Selected action or null if cancelled
+ */
+export async function promptResume() {
+    try {
+        const response = await prompts({
+            type: 'select',
+            name: 'action',
+            message: 'A previous setup was interrupted. What would you like to do?',
+            choices: [
+                { title: 'Resume previous setup', value: 'resume' },
+                { title: 'Start fresh', value: 'fresh' }
+            ]
+        });
+
+        if (!response || response.action == null) {
+            return null;
+        }
+
+        return response.action;
+    } catch (error) {
+        console.error('Error during resume prompt:', error);
+        return null;
+    }
+}
+
+/**
  * Prompts user for initial setup action
  * @returns {Promise<string|null>} Selected action type
  */

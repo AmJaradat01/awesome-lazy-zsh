@@ -4,7 +4,7 @@
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-import { promptInitialAction, getUserSelection } from './prompts.js';
+import { promptInitialAction, getUserSelection, promptResume } from './prompts.js';
 import { handleRestoreBackup } from './utils/backupRestore.js';
 import { runFreshInstallation, runDefaultInstallation } from './utils/pluginManager.js';
 import { chooseTheme, applyDefaultTheme } from './utils/themeManager.js';
@@ -12,6 +12,10 @@ import { runCommand } from './utils/commands.js';
 import { updateAllPlugins } from './utils/updateManager.js';
 import { saveProfile, listProfiles, switchProfile } from './utils/profileManager.js';
 import { installCustomPlugin } from './utils/customPlugins.js';
+import { readState, writeState, deleteState, validateState, isExpired } from './utils/stateManager.js';
+import { updateZshrc } from './utils/zshrcManager.js';
+import { pluginRepos } from './utils/config.js';
+import { runServiceInstallation } from './utils/serviceInstallFlow.js';
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
@@ -96,6 +100,147 @@ async function handleCustomPlugin() {
 }
 
 /**
+ * Installs a single plugin by name (mirrors logic from pluginManager).
+ * @param {string} pluginName - Plugin name to install
+ * @returns {Promise<boolean>} Installation success status
+ */
+async function installSinglePlugin(pluginName) {
+    const repoUrl = pluginRepos[pluginName];
+
+    if (!repoUrl || repoUrl === '') {
+        console.log(chalk.blue(`ℹ️ ${pluginName} is a built-in Oh My Zsh plugin.`));
+        return true;
+    }
+
+    if (repoUrl === 'alias-only') {
+        console.log(chalk.blue(`ℹ️ ${pluginName} will be loaded as a custom alias file.`));
+        return true;
+    }
+
+    const pluginPath = path.join(os.homedir(), `.oh-my-zsh/custom/plugins/${pluginName}`);
+
+    if (fs.existsSync(pluginPath)) {
+        console.log(chalk.blue(`ℹ️ ${pluginName} plugin is already installed.`));
+        return true;
+    }
+
+    try {
+        console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
+        await runCommand(`git clone ${repoUrl} ${pluginPath}`);
+
+        if (fs.existsSync(pluginPath)) {
+            console.log(chalk.green(`✅ ${pluginName} plugin installed successfully.`));
+            return true;
+        } else {
+            throw new Error('Plugin directory not created');
+        }
+    } catch (error) {
+        console.error(chalk.red(`❌ Failed to install ${pluginName}: ${error.message}`));
+        return false;
+    }
+}
+
+/**
+ * Resumes setup from a previously saved checkpoint.
+ * @param {Object} state - The validated state object to resume from.
+ */
+async function resumeFromCheckpoint(state) {
+    const checkpoint = state.checkpoint;
+
+    console.log(chalk.bold.blue(`🔄 Resuming setup from checkpoint: ${checkpoint}`));
+    separator();
+
+    try {
+        if (checkpoint === 'plugin_selection') {
+            // Install pending plugins
+            const pending = state.pendingPlugins || [];
+            const installed = [...(state.installedPlugins || [])];
+
+            if (pending.length > 0) {
+                console.log(chalk.bold.cyan(`📦 Installing ${pending.length} remaining plugin(s)...`));
+
+                for (const plugin of pending) {
+                    const success = await installSinglePlugin(plugin);
+                    if (success) {
+                        installed.push(plugin);
+                        writeState({
+                            installedPlugins: installed,
+                            pendingPlugins: pending.filter(p => p !== plugin)
+                        });
+                    } else {
+                        console.log(chalk.yellow(`⚠️ Skipping ${plugin}, will continue with remaining plugins.`));
+                    }
+                }
+            }
+
+            console.log(chalk.green(`✅ Plugin installation complete.`));
+            separator();
+
+            // Proceed to service installation
+            console.log(chalk.bold.cyan('🔧 Proceeding to service installation...'));
+            try {
+                await runServiceInstallation(installed);
+            } catch (error) {
+                console.log(chalk.yellow(`⚠️ Service installation step failed: ${error.message}`));
+            }
+            separator();
+
+            // Proceed to theme selection
+            console.log(chalk.bold.cyan('🎨 Proceeding to theme selection...'));
+            await chooseTheme(installed);
+            separator();
+
+        } else if (checkpoint === 'plugin_installation') {
+            // Skip plugins, go to service installation
+            const installed = state.installedPlugins || [];
+
+            console.log(chalk.bold.cyan('🔧 Proceeding to service installation...'));
+            try {
+                await runServiceInstallation(installed);
+            } catch (error) {
+                console.log(chalk.yellow(`⚠️ Service installation step failed: ${error.message}`));
+            }
+            separator();
+
+            // Proceed to theme selection
+            console.log(chalk.bold.cyan('🎨 Proceeding to theme selection...'));
+            await chooseTheme(installed);
+            separator();
+
+        } else if (checkpoint === 'service_installation') {
+            // Skip plugins and services, go to theme selection
+            const installed = state.installedPlugins || [];
+
+            console.log(chalk.bold.cyan('🎨 Proceeding to theme selection...'));
+            await chooseTheme(installed);
+            separator();
+
+        } else if (checkpoint === 'theme_selection') {
+            // Apply saved theme directly without re-prompting
+            const installed = state.installedPlugins || [];
+            const theme = state.selectedTheme;
+
+            if (theme) {
+                console.log(chalk.green(`✅ Applying previously selected theme: ${theme}`));
+                await updateZshrc(installed, theme);
+            } else {
+                console.log(chalk.yellow('⚠️ No theme was saved, applying default theme.'));
+                await updateZshrc(installed, 'robbyrussell');
+            }
+            separator();
+        }
+
+        // Cleanup state file on successful completion
+        deleteState();
+        console.log(chalk.green.bold('✅ Setup resumed and completed successfully!'));
+
+    } catch (error) {
+        console.error(chalk.red(`❌ Error during resumed setup: ${error.message}`));
+        console.log(chalk.yellow('⚠️ Your progress has been saved. You can try resuming again.'));
+    }
+}
+
+/**
  * Main application entry point
  */
 async function main() {
@@ -108,6 +253,27 @@ async function main() {
             return;
         }
         separator();
+
+        // Resume detection
+        const existingState = readState();
+        if (existingState) {
+            if (!validateState(existingState) || isExpired(existingState)) {
+                deleteState();
+                // Fall through to normal flow
+            } else {
+                const choice = await promptResume();
+                if (choice === 'resume') {
+                    await resumeFromCheckpoint(existingState);
+                    return;
+                } else if (choice === 'fresh') {
+                    deleteState();
+                    // Fall through to normal flow
+                } else {
+                    // Ctrl+C — exit without touching state
+                    return;
+                }
+            }
+        }
 
         const startOption = await promptInitialAction();
 
@@ -133,6 +299,7 @@ async function main() {
             await chooseTheme(plugins);
             separator();
             console.log('✅ Setup completed successfully.');
+            deleteState();
         } else if (startOption === 'defaultInstallation') {
             console.log('⚠️ Starting default installation...');
             separator();
@@ -146,6 +313,7 @@ async function main() {
             await applyDefaultTheme(plugins);
             separator();
             console.log('✅ Default setup completed successfully.');
+            deleteState();
         } else if (startOption === 'updatePlugins') {
             console.log('🔄 Updating plugins...');
             separator();

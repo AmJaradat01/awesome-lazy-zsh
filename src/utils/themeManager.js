@@ -10,6 +10,7 @@ import os from 'os';
 import chalk from 'chalk';
 import { themeRepos } from './config.js';  // Import theme repository mappings
 import { updateZshrc } from './zshrcManager.js';
+import { writeState } from './stateManager.js';
 
 /**
  * Installs a theme with validation and fallback
@@ -80,6 +81,13 @@ export async function chooseTheme(plugins = []) {
     }
 
     console.log(chalk.bold.cyan('Selected theme:'), selectedTheme);
+
+    // Save state checkpoint: theme selection complete
+    writeState({
+        checkpoint: 'theme_selection',
+        selectedTheme: selectedTheme
+    });
+
     const success = await installTheme(selectedTheme);
 
     if (success) {

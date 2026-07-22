@@ -1,13 +1,13 @@
 {
   "name": "awesome-lazy-zsh",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Awesome-Lazy-Zsh is a streamlined Zsh setup tool, designed for easy customization of your terminal environment.",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "setup": "bash setup.sh",
-    "test": "node --test"
+    "test": "node --test --test-concurrency=1"
   },
   "keywords": [
     "zsh setup",
