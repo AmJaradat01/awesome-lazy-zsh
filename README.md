@@ -1,6 +1,6 @@
 # Awesome Lazy Zsh
 
-[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v3.1.5-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![Version](https://img.shields.io/badge/version-v3.2.1-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 🚀 **The easiest way to set up and manage your Zsh environment**
 
@@ -15,7 +15,16 @@ Awesome-Lazy-Zsh is a powerful yet simple tool that automates your Zsh setup wit
 - 🖥️ **Interactive CLI** - Beautiful, user-friendly setup wizard
 - 🔧 **Auto Dependencies** - Installs Git, Node.js, Homebrew automatically
 
-### New in v3.1.0
+### New in v3.2.0
+- 📦 **Service Installation** - Actually install MongoDB, MySQL, PostgreSQL, Redis, RabbitMQ, Elasticsearch, Memcached (not just aliases!)
+- ☁️ **Cloud CLI Installation** - Install AWS CLI, Google Cloud SDK, Azure CLI
+- 🛠️ **DevOps Tool Installation** - Install kubectl, Terraform, Ansible, Docker Compose
+- 💻 **Language Runtime Installation** - Install Python, Go, Rust, Java (OpenJDK)
+- 🔍 **Platform Auto-Detection** - Automatically uses Homebrew (macOS), apt (Debian/Ubuntu), or yum (RHEL/CentOS)
+- ✅ **Pre-Installation Checks** - Skips already-installed tools
+- 🚀 **Post-Install Service Start** - Optionally start services immediately after installation
+
+### Since v3.1.0
 - 🗄️ **Database Services** - MongoDB, PostgreSQL, MySQL, Redis, RabbitMQ, Elasticsearch, Memcached
 - ☁️ **Cloud CLI Tools** - AWS, Google Cloud, Azure shortcuts
 - 🐳 **DevOps Tools** - Kubernetes, Docker Compose, Terraform, Ansible
