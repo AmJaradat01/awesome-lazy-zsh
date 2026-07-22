@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author: Ali M. Jaradat
 # Since: 1-Jan-2022
-# Version: 3.1.5
+# Version: 3.1.6
 # Description: Comprehensive Zsh environment setup with plugin management, themes, and profiles.
 #              Installs dependencies (Git, Node.js, Homebrew, fzf) and provides interactive CLI
 #              for plugin updates, profile switching, and custom plugin installation.
@@ -137,8 +137,8 @@ secure_download() {
 get_homebrew_checksum() {
     # For security, we should verify the installer
     # Since Homebrew doesn't provide static checksums, we'll verify the source
-    log_warning "Homebrew installer will be downloaded from official source"
-    log_warning "Please verify the installer source manually if security is critical"
+    log_warning "Homebrew installer will be downloaded from official source" >&2
+    log_warning "Please verify the installer source manually if security is critical" >&2
     echo "skip"
 }
 
@@ -233,7 +233,7 @@ install_node() {
 
 confirm_install() {
     echo
-    echo "🚀 Awesome-Lazy-Zsh v3.1.5 Setup"
+    echo "🚀 Awesome-Lazy-Zsh v3.1.6 Setup"
     echo "This setup will install dependencies and provide:"
     echo "- Git, Node.js, Homebrew, fzf (if not installed)"
     echo "- Plugin management (40+ plugins with updates)"
