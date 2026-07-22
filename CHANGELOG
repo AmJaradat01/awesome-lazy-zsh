@@ -2,6 +2,79 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.1] - 2026-07-22
+
+### Added
+- **Expanded Tool Installation** - 11 new installable tools:
+  - Cloud CLI: AWS CLI, Google Cloud SDK, Azure CLI
+  - DevOps: kubectl, Terraform, Ansible, Docker Compose
+  - Languages: Python 3, Go, Rust, Java (OpenJDK)
+- CLI tools and languages correctly skip the "Start services?" prompt
+
+## [3.2.0] - 2026-07-22
+
+### Added
+- **Service Installation** - Actual server installation when selecting service plugins
+  - Interactive prompt after plugin selection to install real servers
+  - Granular multi-select for choosing which services to install
+  - Platform auto-detection (Homebrew on macOS, apt/yum on Linux)
+  - Pre-installation binary checks (skip already-installed services)
+  - Post-install option to start services immediately
+  - Progress reporting with final summary
+  - Fail-forward strategy (one failure doesn't block others)
+- **New modules**: serviceRegistry, platformDetector, serviceInstaller, serviceInstallFlow
+- **Property-based tests** - 22 tests covering all correctness properties using fast-check
+- **Test infrastructure** - Node.js built-in test runner with fast-check for PBT
+
+### Supported Services (macOS/Linux)
+- MongoDB Community Server (`brew tap mongodb/brew && brew install mongodb-community`)
+- MySQL Community Server (`brew install mysql`)
+- PostgreSQL (`brew install postgresql@14`)
+- Redis (`brew install redis`)
+- RabbitMQ (`brew install rabbitmq`)
+- Elasticsearch (`brew tap elastic/tap && brew install elastic/tap/elasticsearch-full`)
+- Memcached (`brew install memcached`)
+
+## [3.1.8] - 2026-07-22
+
+### Fixed
+- **Spaceship Theme Symlink** - Create symlink even when theme directory already exists from prior install
+
+## [3.1.7] - 2026-07-22
+
+### Fixed
+- **Oh My Zsh Plugin Loading** - Alias-only plugins (mongodb, mysql, redis, directories, history-search) no longer added to `plugins=()` array
+- **Spaceship Theme** - Symlink created for Oh My Zsh to discover the theme
+- Introduced `alias-only` marker in config.js to distinguish custom alias files from real Oh My Zsh plugins
+
+## [3.1.6] - 2026-07-22
+
+### Fixed
+- **Homebrew Checksum Verification** - `get_homebrew_checksum` log_warning output no longer contaminates return value via command substitution
+- Redirected warnings to stderr so `secure_download` correctly receives "skip" and bypasses verification
+
+## [3.1.5] - 2026-01-09
+
+### Added
+- GitHub Actions workflow to auto-update Homebrew formula on release
+- Homebrew formula for `brew install` support
+
+## [3.1.4] - 2026-01-09
+
+### Added
+- GitHub issue templates (bug report, feature request)
+- Pull request template
+
+## [3.1.3] - 2026-01-09
+
+### Fixed
+- Minor stability improvements
+
+## [3.1.2] - 2026-01-09
+
+### Fixed
+- Configuration fixes
+
 ## [3.1.1] - 2026-01-09
 
 ### Fixed
