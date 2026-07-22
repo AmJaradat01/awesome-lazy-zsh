@@ -7,14 +7,36 @@ on:
 jobs:
   update-homebrew:
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
-      - name: Update Homebrew formula
-        uses: mislav/bump-homebrew-formula-action@v3.2
+      - name: Checkout homebrew tap
+        uses: actions/checkout@v4
         with:
-          formula-name: awesome-lazy-zsh
-          homebrew-tap: AmJaradat01/homebrew-awesome-lazy-zsh
-          download-url: https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/${{ github.event.release.tag_name }}.tar.gz
+          repository: AmJaradat01/homebrew-awesome-lazy-zsh
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: homebrew-tap
+
+      - name: Update formula
         env:
-          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          TARBALL_URL="https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/${TAG}.tar.gz"
+          SHA256=$(curl -sL "$TARBALL_URL" | shasum -a 256 | cut -d ' ' -f 1)
+          
+          cd homebrew-tap/Formula
+          sed -i "s|url \".*\"|url \"${TARBALL_URL}\"|" awesome-lazy-zsh.rb
+          sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|" awesome-lazy-zsh.rb
+          
+          echo "Updated formula to ${TAG} with SHA256: ${SHA256}"
+          cat awesome-lazy-zsh.rb
+
+      - name: Commit and push
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          cd homebrew-tap
+          git config user.name "Ali M. Jaradat"
+          git config user.email "amjaradat01@gmail.com"
+          git add Formula/awesome-lazy-zsh.rb
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: bump formula to ${TAG}"
+          git push
