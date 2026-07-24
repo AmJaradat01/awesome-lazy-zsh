@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.2] - 2026-07-24
+
+### Security
+- **Comprehensive codebase hardening**
+  - Add path traversal and URL validation for custom plugins (HTTPS-only, reject localhost/private IPs/embedded credentials)
+  - Pin all external plugin/theme repos to specific release tags with shallow clones
+  - Replace predictable temp directory with `mktemp -d` + restrictive permissions
+  - Set `0o600` permissions on backup files and state files
+  - Add binary/package name validators before shell interpolation
+  - Sanitize theme/plugin names before writing to `.zshrc`
+  - Harden self-update: verify git remote origin, use `--ignore-scripts` for npm
+  - Add download sanity checks (shebang validation, file size bounds) in setup.sh
+  - Remove dead code (`serviceManager.js`) with unsafe shell patterns
+
+### Changed
+- Track `package-lock.json` in version control for reproducible installs
+- README: Add `brew trust` step to Homebrew installation instructions
+
 ## [3.4.0] - 2026-07-24
 
 ### Added
