@@ -148,7 +148,7 @@ async function handleCustomPlugin() {
                 if (!currentPlugins.includes(name)) {
                     currentPlugins.push(name);
                     content = content.replace(/plugins=\([^)]+\)/, `plugins=(${currentPlugins.join(' ')})`);
-                    fs.writeFileSync(zshrcPath, content, 'utf8');
+                    fs.writeFileSync(zshrcPath, content, { encoding: 'utf8', mode: 0o600 });
                     console.log(chalk.green(`✅ ${name} added to .zshrc plugins`));
                     console.log(chalk.yellow(`⚠️ Run 'source ~/.zshrc' to activate`));
                 }

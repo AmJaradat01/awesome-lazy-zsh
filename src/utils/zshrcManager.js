@@ -198,7 +198,7 @@ function backupExistingZshrc(zshrcPath) {
     if (fs.existsSync(zshrcPath)) {
         const backupPath = `${zshrcPath}.backup.${Date.now()}`;
         const zshrcContent = fs.readFileSync(zshrcPath, 'utf8');
-        fs.writeFileSync(backupPath, zshrcContent, 'utf8');
+        fs.writeFileSync(backupPath, zshrcContent, { encoding: 'utf8', mode: 0o600 });
         console.log(chalk.blue(`ℹ️ Existing .zshrc backed up to: ${backupPath}`));
         return backupPath;
     }
@@ -273,7 +273,7 @@ export async function updateZshrc(newPlugins, theme) {
         zshrcContent += aliasSection;
 
         // Write the updated content to the .zshrc file
-        fs.writeFileSync(zshrcPath, zshrcContent, 'utf-8');
+        fs.writeFileSync(zshrcPath, zshrcContent, { encoding: 'utf-8', mode: 0o600 });
         console.log(chalk.green(`✅ .zshrc updated with selected plugins and theme: ${theme}`));
         console.log(chalk.yellow(`⚠️ Please restart your terminal or run 'source ~/.zshrc' to apply changes.`));
     } catch (error) {

@@ -44,12 +44,18 @@ fi
 # History stats
 alias htop10='history | awk '\''{print $2}'\'' | sort | uniq -c | sort -rn | head -10'
 
-# Search and run from history
+# Search and run from history (with confirmation)
 hr() {
     local cmd=$(history | grep "$1" | tail -1 | sed 's/^[ ]*[0-9]*[ ]*//')
     if [[ -n "$cmd" ]]; then
-        echo "Running: $cmd"
-        eval "$cmd"
+        echo "Command: $cmd"
+        read -q "confirm?Run this command? [y/N] "
+        echo
+        if [[ "$confirm" == "y" ]]; then
+            eval "$cmd"
+        else
+            echo "Cancelled."
+        fi
     else
         echo "No match found for: $1"
     fi

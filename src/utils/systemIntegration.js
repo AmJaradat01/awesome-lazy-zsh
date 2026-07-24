@@ -7,7 +7,6 @@ import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { runCommand } from './commands.js';
 
 /**
  * Detects current system platform and architecture

@@ -40,6 +40,11 @@ dotenv-show() {
 }
 
 # Auto-load .env on directory change (optional - enable with: DOTENV_AUTO=1)
+# ⚠️  SECURITY WARNING: When enabled, .env files in ANY directory you cd into
+#     will be sourced automatically. This means a malicious .env file in a
+#     cloned repository could set arbitrary environment variables or execute
+#     code via shell expansion. Only enable this if you trust all directories
+#     you navigate into.
 _dotenv_auto_load() {
     [[ "$DOTENV_AUTO" != "1" ]] && return
     [[ -f .env ]] && dotenv

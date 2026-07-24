@@ -16,7 +16,7 @@ const PROFILES_DIR = path.join(os.homedir(), '.awesome-lazy-zsh/profiles');
  */
 export function ensureProfilesDir() {
     if (!fs.existsSync(PROFILES_DIR)) {
-        fs.mkdirSync(PROFILES_DIR, { recursive: true });
+        fs.mkdirSync(PROFILES_DIR, { recursive: true, mode: 0o700 });
     }
 }
 
@@ -104,7 +104,7 @@ export function exportProfile(name, outputPath) {
     const profile = loadProfile(name);
     if (!profile) return false;
     
-    fs.writeFileSync(outputPath, JSON.stringify(profile, null, 2));
+    fs.writeFileSync(outputPath, JSON.stringify(profile, null, 2), { mode: 0o600 });
     console.log(chalk.green(`✅ Profile exported to ${outputPath}`));
     return true;
 }
