@@ -4,7 +4,7 @@
  */
 
 import { getUserSelection } from '../prompts.js';
-import { runCommand } from './commands.js';
+import { runCommandSafe } from './commands.js';
 import fs from 'fs';
 import os from 'os';
 import chalk from 'chalk';
@@ -40,7 +40,7 @@ async function installTheme(themeName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${themeName} theme...`));
-        const success = await runCommand(`git clone ${repoUrl} ${themePath}`);
+        const success = await runCommandSafe('git', ['clone', repoUrl, themePath]);
         
         if (success && fs.existsSync(themePath)) {
             // Create symlink for Oh My Zsh to find the theme

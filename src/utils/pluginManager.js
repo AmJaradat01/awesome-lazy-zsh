@@ -4,7 +4,7 @@
  */
 
 import { getUserSelection } from '../prompts.js';
-import { runCommand } from './commands.js';
+import { runCommandSafe } from './commands.js';
 import { updateZshrc } from './zshrcManager.js';
 import { runServiceInstallation } from './serviceInstallFlow.js';
 import { pluginRepos } from './config.js';
@@ -49,7 +49,7 @@ async function installPlugin(pluginName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
-        await runCommand(`git clone ${repoUrl} ${pluginPath}`);
+        await runCommandSafe('git', ['clone', repoUrl, pluginPath]);
         
         // Verify installation
         if (fs.existsSync(pluginPath)) {

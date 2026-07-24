@@ -3,7 +3,7 @@
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-import { runCommand } from './commands.js';
+import { runCommandSafe } from './commands.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -62,7 +62,7 @@ export async function installCustomPlugin(name, repoUrl) {
     }
     
     console.log(chalk.yellow(`⚠️ Installing custom plugin ${name}...`));
-    const success = await runCommand(`git clone ${repoUrl} ${pluginPath}`);
+    const success = await runCommandSafe('git', ['clone', repoUrl, pluginPath]);
     
     if (success) {
         addCustomPlugin(name, repoUrl);

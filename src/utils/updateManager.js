@@ -3,7 +3,7 @@
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-import { runCommand } from './commands.js';
+import { runCommandSafe } from './commands.js';
 import { pluginRepos } from './config.js';
 import fs from 'fs';
 import path from 'path';
@@ -29,7 +29,7 @@ export async function updatePlugin(pluginName) {
     }
 
     console.log(chalk.yellow(`🔄 Updating ${pluginName}...`));
-    const success = await runCommand(`cd ${pluginPath} && git pull`);
+    const success = await runCommandSafe('git', ['pull'], { cwd: pluginPath });
     
     if (success) {
         console.log(chalk.green(`✅ ${pluginName} updated`));
@@ -74,5 +74,5 @@ export async function rollbackPlugin(pluginName) {
     if (!fs.existsSync(pluginPath)) return false;
     
     console.log(chalk.yellow(`⏪ Rolling back ${pluginName}...`));
-    return await runCommand(`cd ${pluginPath} && git reset --hard HEAD~1`);
+    return await runCommandSafe('git', ['reset', '--hard', 'HEAD~1'], { cwd: pluginPath });
 }

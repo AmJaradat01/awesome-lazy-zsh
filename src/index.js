@@ -8,7 +8,7 @@ import { promptInitialAction, getUserSelection, promptResume, promptUpdate } fro
 import { handleRestoreBackup } from './utils/backupRestore.js';
 import { runFreshInstallation, runDefaultInstallation } from './utils/pluginManager.js';
 import { chooseTheme, applyDefaultTheme } from './utils/themeManager.js';
-import { runCommand } from './utils/commands.js';
+import { runCommand, runCommandSafe } from './utils/commands.js';
 import { updateAllPlugins } from './utils/updateManager.js';
 import { saveProfile, listProfiles, switchProfile } from './utils/profileManager.js';
 import { installCustomPlugin } from './utils/customPlugins.js';
@@ -174,7 +174,7 @@ async function installSinglePlugin(pluginName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
-        await runCommand(`git clone ${repoUrl} ${pluginPath}`);
+        await runCommandSafe('git', ['clone', repoUrl, pluginPath]);
 
         if (fs.existsSync(pluginPath)) {
             console.log(chalk.green(`✅ ${pluginName} plugin installed successfully.`));
