@@ -1,6 +1,6 @@
 # Awesome Lazy Zsh
 
-![Version](https://img.shields.io/badge/version-v3.3.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)
+![Version](https://img.shields.io/badge/version-v3.3.0-blue.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg)
 
 🚀 **The easiest way to set up and manage your Zsh environment**
 
