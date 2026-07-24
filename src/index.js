@@ -114,7 +114,25 @@ async function handleCustomPlugin() {
     const { repo } = await prompts({ type: 'text', name: 'repo', message: 'Repository URL:' });
     
     if (name && repo) {
-        await installCustomPlugin(name, repo);
+        const success = await installCustomPlugin(name, repo);
+        if (success) {
+            // Add to .zshrc plugins array
+            const zshrcPath = path.join(os.homedir(), '.zshrc');
+            if (fs.existsSync(zshrcPath)) {
+                let content = fs.readFileSync(zshrcPath, 'utf8');
+                const pluginMatch = content.match(/plugins=\(([^)]+)\)/);
+                if (pluginMatch) {
+                    const currentPlugins = pluginMatch[1].split(/\s+/).filter(Boolean);
+                    if (!currentPlugins.includes(name)) {
+                        currentPlugins.push(name);
+                        content = content.replace(/plugins=\([^)]+\)/, `plugins=(${currentPlugins.join(' ')})`);
+                        fs.writeFileSync(zshrcPath, content, 'utf8');
+                        console.log(chalk.green(`✅ ${name} added to .zshrc plugins`));
+                        console.log(chalk.yellow(`⚠️ Run 'source ~/.zshrc' to activate`));
+                    }
+                }
+            }
+        }
     }
 }
 
