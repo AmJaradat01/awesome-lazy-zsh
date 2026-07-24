@@ -20,6 +20,9 @@
   ],
   "author": "Ali M. Jaradat <AmJaradat01@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/AmJaradat01/awesome-lazy-zsh.git"
