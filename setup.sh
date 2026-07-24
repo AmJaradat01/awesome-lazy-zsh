@@ -57,13 +57,15 @@ trap cleanup EXIT INT TERM
 
 
 print_ascii_logo() {
+    local version
+    version=$(node -e "import fs from 'fs';const p=JSON.parse(fs.readFileSync('${SCRIPT_DIR}/package.json','utf8'));console.log(p.version)" 2>/dev/null || echo "")
     echo -e "${GREEN}     _                                               _                         _____    _     ";
     echo -e "    / \__      _____  ___  ___  _ __ ___   ___      | |    __ _ _____   _     |__  /___| |__  ";
     echo -e "   / _ \ \ /\ / / _ \/ __|/ _ \| '_ \` _ \ / _ \_____| |   / _\` |_  / | | |_____ / // __| '_ \ ";
     echo -e "  / ___ \ V  V /  __/\__ \ (_) | | | | | |  __/_____| |__| (_| |/ /| |_| |_____/ /_\__ \ | | |";
     echo -e " /_/   \_\_/\_/ \___||___/\___/|_| |_| |_|\___|     |_____\__,_/___|\__, |    /____|___/_| |_|";
-    echo -e "                                                                    |___/                     ${RESET}";
-    echo "                                                                                              ";
+    echo -e "                                                                    |___/          v${version}${RESET}";
+    echo "";
 }
 
 
