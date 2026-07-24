@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.0] - 2026-07-24
+
+### Added
+- **Update Notification** - Interactive self-update prompt on startup
+  - Checks GitHub for newer versions (throttled: once per 24 hours)
+  - Presents "Yes, update now / No / Skip this version" choices
+  - Auto-detects install method (git pull or brew upgrade)
+  - "Skip this version" prevents repeated prompts for same release
+  - 5-second timeout, graceful degradation on network failure
+- **ASCII art banner with version** in the Node.js CLI startup
+
+### Changed
+- Removed redundant version/feature text from setup.sh (Node.js CLI now handles the banner)
+
 ## [3.3.0] - 2026-07-22
 
 ### Added

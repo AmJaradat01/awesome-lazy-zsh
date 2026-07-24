@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author: Ali M. Jaradat
 # Since: 1-Jan-2022
-# Version: 3.3.0
+# Version: 3.4.0
 # Description: Comprehensive Zsh environment setup with plugin management, themes, and profiles.
 #              Installs dependencies (Git, Node.js, Homebrew, fzf) and provides interactive CLI
 #              for plugin updates, profile switching, and custom plugin installation.
@@ -233,26 +233,19 @@ install_node() {
 
 confirm_install() {
     echo
-    echo "🚀 Awesome-Lazy-Zsh v3.3.0 Setup"
-    echo "This setup will install dependencies and provide:"
-    echo "- Git, Node.js, Homebrew, fzf (if not installed)"
-    echo "- Plugin management (40+ plugins with updates)"
-    echo "- Theme customization (5 popular themes)"
-    echo "- Configuration profiles (save/switch setups)"
-    echo "- Custom plugin support (any Git repository)"
-    echo "- Database services (MongoDB, PostgreSQL, MySQL, Redis, etc.)"
-    echo "- Cloud CLI tools (AWS, GCloud, Azure)"
-    echo "- DevOps tools (Kubernetes, Terraform, Ansible)"
-    echo "- Development aliases and system optimizations"
+    echo "This setup will install dependencies and launch the interactive CLI."
+    echo
+    echo "Dependencies (installed if missing):"
+    echo "  • Git, Node.js, Homebrew, fzf"
     echo
     echo "✨ Features:"
-    echo "✓ Automatic backups before changes"
-    echo "✓ Interactive CLI with menu options"
+    echo "✓ 42 plugins with auto-update notifications"
+    echo "✓ 5 themes (Spaceship, Powerlevel10k, etc.)"
     echo "✓ Resume interrupted setups automatically"
     echo "✓ Cross-platform support (macOS/Linux/WSL2)"
     echo "✓ Installation logging to: $LOG_FILE"
     echo
-    read -p "Do you want to proceed with the installation? (y/n): " answer
+    read -p "Do you want to proceed? (y/n): " answer
     if [[ "$(echo "$answer" | tr '[:upper:]' '[:lower:]')" != "y" ]]; then
         log_info "Installation cancelled by user"
         exit 0
