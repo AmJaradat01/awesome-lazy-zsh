@@ -8,7 +8,7 @@ import { promptInitialAction, getUserSelection, promptResume, promptUpdate } fro
 import { handleRestoreBackup } from './utils/backupRestore.js';
 import { runFreshInstallation, runDefaultInstallation } from './utils/pluginManager.js';
 import { chooseTheme, applyDefaultTheme } from './utils/themeManager.js';
-import { runCommand, runCommandSafe } from './utils/commands.js';
+import { runCommandSafe } from './utils/commands.js';
 import { updateAllPlugins } from './utils/updateManager.js';
 import { saveProfile, listProfiles, switchProfile } from './utils/profileManager.js';
 import { installCustomPlugin } from './utils/customPlugins.js';
@@ -27,7 +27,8 @@ import prompts from 'prompts';
 const separator = () => console.log(chalk.magentaBright('\n-------------------------\n'));
 
 /**
- * Ensures Oh My Zsh is installed before proceeding
+ * Ensures Oh My Zsh is installed before proceeding.
+ * Downloads the installer to a temp file, validates it, then executes.
  * @returns {Promise<boolean>} Installation success status
  */
 async function ensureOhMyZshInstalled() {
@@ -35,14 +36,57 @@ async function ensureOhMyZshInstalled() {
     
     if (!fs.existsSync(ohMyZshPath)) {
         console.log(chalk.yellow('⚠️ Oh My Zsh is not installed. Installing...'));
-        const success = await runCommand('sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"');
-        
-        if (!success || !fs.existsSync(ohMyZshPath)) {
-            console.error(chalk.red('❌ Failed to install Oh My Zsh. Please install it manually.'));
-            return false;
+
+        const installerUrl = 'https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh';
+        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'awesome-lazy-zsh-'));
+        const installerPath = path.join(tmpDir, 'install.sh');
+
+        try {
+            // Download installer to temp file
+            const downloadSuccess = await runCommandSafe('curl', ['-fsSL', '-o', installerPath, installerUrl]);
+            if (!downloadSuccess || !fs.existsSync(installerPath)) {
+                console.error(chalk.red('❌ Failed to download Oh My Zsh installer.'));
+                return false;
+            }
+
+            // Validate: must be a shell script
+            const content = fs.readFileSync(installerPath, 'utf8');
+            const firstLine = content.split('\n')[0];
+            if (!firstLine.startsWith('#!/') || !firstLine.includes('sh')) {
+                console.error(chalk.red('❌ Downloaded file does not appear to be a valid shell script.'));
+                console.error(chalk.red(`   First line: ${firstLine}`));
+                return false;
+            }
+
+            // Validate: reasonable size (installer should be 5KB–500KB)
+            const fileSize = Buffer.byteLength(content, 'utf8');
+            if (fileSize < 5000 || fileSize > 512000) {
+                console.error(chalk.red(`❌ Installer has unexpected size (${fileSize} bytes). Aborting.`));
+                return false;
+            }
+
+            // Validate: must contain expected Oh My Zsh markers
+            if (!content.includes('oh-my-zsh') && !content.includes('ohmyzsh')) {
+                console.error(chalk.red('❌ Installer does not appear to be the Oh My Zsh install script.'));
+                return false;
+            }
+
+            // Execute the validated installer (RUNZSH=no prevents it from launching zsh)
+            fs.chmodSync(installerPath, 0o700);
+            const success = await runCommandSafe('sh', [installerPath], { timeout: 120000 });
+
+            if (!success || !fs.existsSync(ohMyZshPath)) {
+                console.error(chalk.red('❌ Failed to install Oh My Zsh. Please install it manually.'));
+                return false;
+            }
+
+            console.log(chalk.green('✅ Oh My Zsh installed successfully.'));
+        } finally {
+            // Clean up temp files
+            try {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+            } catch { /* ignore cleanup errors */ }
         }
-        
-        console.log(chalk.green('✅ Oh My Zsh installed successfully.'));
     } else {
         console.log(chalk.blue('ℹ️ Oh My Zsh is already installed.'));
     }
