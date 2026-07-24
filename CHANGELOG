@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.3] - 2026-07-24
+
+### Security
+- **Replace `curl | sh` with download-validate-execute for Oh My Zsh installer**
+  - Download installer to secure temp file (no shell interpolation)
+  - Validate shebang, file size (5KB–500KB), and content markers before execution
+  - Clean up temp files automatically
+- **File permission hardening (round 2)**
+  - Set `0o600` on all `.zshrc` writes (backup, main write, custom plugin update)
+  - Set `0o700` on profiles directory creation
+  - Set `0o600` on profile export writes
+- **Add confirmation prompt to `hr()` history-eval function**
+- **Add security warning for `DOTENV_AUTO` auto-source feature**
+- **Remove dead `runCommand` imports** (unsafe shell-string executor no longer used in main app)
+
 ## [3.4.2] - 2026-07-24
 
 ### Security
