@@ -35,10 +35,9 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Test files
+# Test output files
 test-*
 validate.*
-*.test.js
 
 # Build files
 dist/
