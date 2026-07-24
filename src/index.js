@@ -254,14 +254,6 @@ async function main() {
         const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
         const version = pkg.version;
 
-        // ASCII art banner with version
-        console.log(chalk.green('     _                                               _                         _____    _     '));
-        console.log(chalk.green('    / \\__      _____  ___  ___  _ __ ___   ___      | |    __ _ _____   _     |__  /___| |__  '));
-        console.log(chalk.green('   / _ \\ \\ /\\ / / _ \\/ __|/ _ \\| \'_ ` _ \\ / _ \\_____| |   / _` |_  / | | |_____ / // __| \'_ \\ '));
-        console.log(chalk.green('  / ___ \\ V  V /  __/\\__ \\ (_) | | | | | |  __/_____| |__| (_| |/ /| |_| |_____/ /_\\__ \\ | | |'));
-        console.log(chalk.green(' /_/   \\_\\_/\\_/ \\___||___/\\___/|_| |_| |_|\\___|     |_____\\__,_/___|\\__, |    /____|___/_| |_|'));
-        console.log(chalk.green(`                                                                    |___/          v${version}`));
-        console.log('');
         separator();
 
         // Update check
