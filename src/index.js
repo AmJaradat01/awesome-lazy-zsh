@@ -110,26 +110,37 @@ async function handleProfileManagement() {
  * Handles custom plugin installation from user input
  */
 async function handleCustomPlugin() {
-    const { name } = await prompts({ type: 'text', name: 'name', message: 'Plugin name:' });
-    const { repo } = await prompts({ type: 'text', name: 'repo', message: 'Repository URL:' });
+    console.log(chalk.blue('\nℹ️ Browse plugins: https://github.com/unixorn/awesome-zsh-plugins\n'));
+
+    const { repo } = await prompts({ type: 'text', name: 'repo', message: 'Repository URL (e.g. https://github.com/user/plugin.git):' });
     
-    if (name && repo) {
-        const success = await installCustomPlugin(name, repo);
-        if (success) {
-            // Add to .zshrc plugins array
-            const zshrcPath = path.join(os.homedir(), '.zshrc');
-            if (fs.existsSync(zshrcPath)) {
-                let content = fs.readFileSync(zshrcPath, 'utf8');
-                const pluginMatch = content.match(/plugins=\(([^)]+)\)/);
-                if (pluginMatch) {
-                    const currentPlugins = pluginMatch[1].split(/\s+/).filter(Boolean);
-                    if (!currentPlugins.includes(name)) {
-                        currentPlugins.push(name);
-                        content = content.replace(/plugins=\([^)]+\)/, `plugins=(${currentPlugins.join(' ')})`);
-                        fs.writeFileSync(zshrcPath, content, 'utf8');
-                        console.log(chalk.green(`✅ ${name} added to .zshrc plugins`));
-                        console.log(chalk.yellow(`⚠️ Run 'source ~/.zshrc' to activate`));
-                    }
+    if (!repo) return;
+
+    // Extract plugin name from URL (last path segment, minus .git)
+    const name = repo.replace(/\.git$/, '').split('/').pop();
+
+    if (!name) {
+        console.log(chalk.red('❌ Could not extract plugin name from URL'));
+        return;
+    }
+
+    console.log(chalk.cyan(`📦 Plugin name: ${name}`));
+
+    const success = await installCustomPlugin(name, repo);
+    if (success) {
+        // Add to .zshrc plugins array
+        const zshrcPath = path.join(os.homedir(), '.zshrc');
+        if (fs.existsSync(zshrcPath)) {
+            let content = fs.readFileSync(zshrcPath, 'utf8');
+            const pluginMatch = content.match(/plugins=\(([^)]+)\)/);
+            if (pluginMatch) {
+                const currentPlugins = pluginMatch[1].split(/\s+/).filter(Boolean);
+                if (!currentPlugins.includes(name)) {
+                    currentPlugins.push(name);
+                    content = content.replace(/plugins=\([^)]+\)/, `plugins=(${currentPlugins.join(' ')})`);
+                    fs.writeFileSync(zshrcPath, content, 'utf8');
+                    console.log(chalk.green(`✅ ${name} added to .zshrc plugins`));
+                    console.log(chalk.yellow(`⚠️ Run 'source ~/.zshrc' to activate`));
                 }
             }
         }
