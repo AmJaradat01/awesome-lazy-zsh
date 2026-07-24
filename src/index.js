@@ -4,7 +4,7 @@
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-import { promptInitialAction, getUserSelection, promptResume } from './prompts.js';
+import { promptInitialAction, getUserSelection, promptResume, promptUpdate } from './prompts.js';
 import { handleRestoreBackup } from './utils/backupRestore.js';
 import { runFreshInstallation, runDefaultInstallation } from './utils/pluginManager.js';
 import { chooseTheme, applyDefaultTheme } from './utils/themeManager.js';
@@ -16,6 +16,8 @@ import { readState, writeState, deleteState, validateState, isExpired } from './
 import { updateZshrc } from './utils/zshrcManager.js';
 import { pluginRepos } from './utils/config.js';
 import { runServiceInstallation } from './utils/serviceInstallFlow.js';
+import { checkForUpdate, performUpdate, writeCache, readCache } from './utils/updateChecker.js';
+import { fileURLToPath } from 'url';
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
@@ -245,8 +247,38 @@ async function resumeFromCheckpoint(state) {
  */
 async function main() {
     try {
-        console.log(chalk.bold.blue('🚀 Starting Awesome-Lazy-Zsh setup...'));
+        // Read version from package.json
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const pkgPath = path.resolve(__dirname, '..', 'package.json');
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        const version = pkg.version;
+
+        console.log(chalk.bold.blue(`🚀 Awesome-Lazy-Zsh v${version}`));
         separator();
+
+        // Update check
+        const updateResult = await checkForUpdate();
+        if (updateResult && updateResult.updateAvailable && !updateResult.skipped) {
+            const choice = await promptUpdate(updateResult);
+            if (choice === 'yes') {
+                const result = await performUpdate(updateResult.installMethod);
+                if (result.success) {
+                    console.log(chalk.green.bold('\n✅ Updated successfully! Please re-run awesome-lazy-zsh.\n'));
+                    process.exit(0);
+                }
+                // If update failed, continue to normal flow
+                separator();
+            } else if (choice === 'skip') {
+                const cache = readCache();
+                writeCache({ ...cache, latestVersion: updateResult.latestVersion, skippedVersion: updateResult.latestVersion });
+                separator();
+            }
+            // 'no' or null (Ctrl+C): just continue
+            if (choice !== 'yes' && choice !== 'skip') {
+                separator();
+            }
+        }
 
         // Ensure Oh My Zsh is installed
         if (!(await ensureOhMyZshInstalled())) {

@@ -4,6 +4,7 @@
  */
 
 import prompts from 'prompts';
+import chalk from 'chalk';
 
 /**
  * Generic user selection prompt
@@ -91,4 +92,33 @@ export async function promptInitialAction() {
         console.error('Error during initial action selection:', error);
         return null;
     }
+}
+
+/**
+ * Prompts user about an available update
+ * @param {Object} updateResult - The update check result
+ * @param {string} updateResult.currentVersion - Current installed version
+ * @param {string} updateResult.latestVersion - Latest available version
+ * @param {'git'|'brew'} updateResult.installMethod - Detected installation method
+ * @returns {Promise<'yes'|'no'|'skip'|null>} User's choice or null if cancelled
+ */
+export async function promptUpdate(updateResult) {
+    const { currentVersion, latestVersion, installMethod } = updateResult;
+    const method = installMethod === 'git' ? 'git pull' : 'brew upgrade';
+
+    console.log(chalk.yellow(`\n⚡ Update available: v${currentVersion} → v${latestVersion} (via ${method})\n`));
+
+    const response = await prompts({
+        type: 'select',
+        name: 'action',
+        message: 'Would you like to update?',
+        choices: [
+            { title: 'Yes, update now', value: 'yes' },
+            { title: 'No, continue with current version', value: 'no' },
+            { title: 'Skip this version', value: 'skip' }
+        ]
+    });
+
+    if (!response || response.action == null) return null; // Ctrl+C
+    return response.action;
 }

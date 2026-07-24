@@ -50,9 +50,13 @@ Awesome-Lazy-Zsh automates your Zsh setup with 42 plugins, 5 themes, configurati
 
 ### Via Homebrew 🍺
 ```bash
-brew install amjaradat01/awesome-lazy-zsh/awesome-lazy-zsh
+brew tap amjaradat01/awesome-lazy-zsh
+brew trust amjaradat01/awesome-lazy-zsh
+brew install awesome-lazy-zsh
 awesome-lazy-zsh
 ```
+
+> **Note:** Homebrew requires trusting third-party taps before installing. The `brew trust` step is a one-time requirement.
 
 ### Via Git Clone
 ```bash
