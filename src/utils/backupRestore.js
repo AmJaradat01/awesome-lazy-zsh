@@ -9,14 +9,14 @@ import os from 'os';
 import prompts from 'prompts';
 
 /**
- * Ensures backup directory exists
+ * Ensures backup directory exists with restrictive permissions
  * @returns {string} Backup directory path
  */
 function ensureBackupFolderExists() {
     const backupFolder = path.join(os.homedir(), '.awesome-lazy-zsh_backup');
     if (!fs.existsSync(backupFolder)) {
         try {
-            fs.mkdirSync(backupFolder, { recursive: true });
+            fs.mkdirSync(backupFolder, { recursive: true, mode: 0o700 });
             console.log(`✅ Backup folder created at: ${backupFolder}`);
         } catch (error) {
             console.error(`❌ Error creating backup folder: ${error.message}`);
@@ -38,7 +38,7 @@ export function backupZshrc() {
     try {
         if (fs.existsSync(zshrcPath)) {
             const zshrcContent = fs.readFileSync(zshrcPath, 'utf8');
-            fs.writeFileSync(backupPath, zshrcContent, 'utf8');
+            fs.writeFileSync(backupPath, zshrcContent, { encoding: 'utf8', mode: 0o600 });
             
             // Verify backup was created successfully
             const backupContent = fs.readFileSync(backupPath, 'utf8');
@@ -92,7 +92,7 @@ export async function restoreZshrc() {
             try {
                 const zshrcPath = path.join(os.homedir(), '.zshrc');
                 const backupContent = fs.readFileSync(selectedBackup, 'utf8');
-                fs.writeFileSync(zshrcPath, backupContent, 'utf8');
+                fs.writeFileSync(zshrcPath, backupContent, { encoding: 'utf8', mode: 0o600 });
                 console.log(`✅ .zshrc restored from backup: ${selectedBackup}`);
             } catch (error) {
                 console.error(`❌ Error during restoration: ${error.message}`);

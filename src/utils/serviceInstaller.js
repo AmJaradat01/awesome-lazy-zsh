@@ -23,6 +23,20 @@ import { serviceRegistry } from './serviceRegistry.js';
  */
 
 /**
+ * Validates that a binary name is safe to use in shell commands.
+ * Only allows alphanumeric characters, hyphens, underscores, and dots.
+ * Prevents shell metacharacter injection via `which` or other commands.
+ * @param {string} binary - Binary name to validate
+ * @returns {boolean} True if the binary name is safe
+ */
+function isValidBinaryName(binary) {
+    return typeof binary === 'string' &&
+        binary.length > 0 &&
+        binary.length <= 100 &&
+        /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(binary);
+}
+
+/**
  * Default command executor for isServiceInstalled.
  * Wraps child_process exec in a promise, resolves to true if command exits 0, false otherwise.
  * Same pattern as platformDetector.js.
@@ -58,12 +72,29 @@ function defaultExecCommand(command) {
 /**
  * Checks if a service binary is already present on the system.
  * Uses `which` or `command -v` to check if the binary exists.
+ * Validates binary name before passing to shell to prevent injection.
  * @param {string} binary - Binary name to check (e.g., 'mongod')
  * @param {function} [execCommand] - Optional command executor for testability (resolves to boolean)
  * @returns {Promise<boolean>}
  */
 export async function isServiceInstalled(binary, execCommand = defaultCheckExecCommand) {
+    if (!isValidBinaryName(binary)) {
+        console.log(chalk.red(`❌ Invalid binary name: "${binary}"`));
+        return false;
+    }
     return await execCommand(`which ${binary}`);
+}
+
+/**
+ * Validates that a package name or command segment is safe for shell interpolation.
+ * @param {string} value - Package name or command segment
+ * @returns {boolean} True if safe
+ */
+function isValidPackageName(value) {
+    if (typeof value !== 'string' || value.length === 0 || value.length > 200) return false;
+    // Allow alphanumeric, hyphens, underscores, dots, slashes (for tap/package), @, colons
+    // Reject shell metacharacters: ; & | ` $ ( ) { } < > ! ? * ~ " '
+    return /^[a-zA-Z0-9@/_.:+=-]+$/.test(value);
 }
 
 /**
@@ -85,8 +116,10 @@ export function getInstallCommands(serviceKey, platform) {
     if (packageManager === 'brew') {
         const commands = [];
         if (service.brew.tap !== null) {
+            if (!isValidPackageName(service.brew.tap)) return [];
             commands.push(`brew tap ${service.brew.tap}`);
         }
+        if (!isValidPackageName(service.brew.package)) return [];
         commands.push(`brew install ${service.brew.package}`);
         return commands;
     }
@@ -96,6 +129,10 @@ export function getInstallCommands(serviceKey, platform) {
         if (service.apt.repoSetup !== null) {
             commands.push(service.apt.repoSetup);
         }
+        // Validate each package name
+        for (const pkg of service.apt.packages) {
+            if (!isValidPackageName(pkg)) return [];
+        }
         commands.push(`sudo apt-get install -y ${service.apt.packages.join(' ')}`);
         return commands;
     }
@@ -104,6 +141,10 @@ export function getInstallCommands(serviceKey, platform) {
         const commands = [];
         if (service.yum.repoSetup !== null) {
             commands.push(service.yum.repoSetup);
+        }
+        // Validate each package name
+        for (const pkg of service.yum.packages) {
+            if (!isValidPackageName(pkg)) return [];
         }
         commands.push(`sudo yum install -y ${service.yum.packages.join(' ')}`);
         return commands;
@@ -136,6 +177,7 @@ export function getStartCommands(serviceKey, platform) {
         if (service.port === 0) {
             return [];
         }
+        if (!isValidPackageName(service.brew.package)) return [];
         return [`brew services start ${service.brew.package}`];
     }
 
@@ -143,6 +185,7 @@ export function getStartCommands(serviceKey, platform) {
         if (!service.systemdUnit) {
             return [];
         }
+        if (!isValidBinaryName(service.systemdUnit)) return [];
         return [
             `sudo systemctl start ${service.systemdUnit}`,
             `sudo systemctl enable ${service.systemdUnit}`

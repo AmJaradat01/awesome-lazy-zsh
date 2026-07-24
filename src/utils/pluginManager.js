@@ -23,6 +23,23 @@ const defaultPlugins = [
 ];
 
 /**
+ * Parses a plugin repo URL that may contain a pinned tag/branch reference.
+ * Format: "https://github.com/user/repo.git#v1.2.3"
+ * @param {string} repoUrl - Repository URL potentially with #tag suffix
+ * @returns {{url: string, tag: string|null}} Parsed URL and optional tag
+ */
+function parseRepoUrl(repoUrl) {
+    const hashIndex = repoUrl.indexOf('#');
+    if (hashIndex === -1) {
+        return { url: repoUrl, tag: null };
+    }
+    return {
+        url: repoUrl.substring(0, hashIndex),
+        tag: repoUrl.substring(hashIndex + 1)
+    };
+}
+
+/**
  * Installs a single plugin with validation
  * @param {string} pluginName - Plugin name to install
  * @returns {Promise<boolean>} Installation success status
@@ -49,7 +66,15 @@ async function installPlugin(pluginName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
-        await runCommandSafe('git', ['clone', repoUrl, pluginPath]);
+        
+        const { url, tag } = parseRepoUrl(repoUrl);
+        const cloneArgs = ['clone', '--depth', '1'];
+        if (tag) {
+            cloneArgs.push('--branch', tag);
+        }
+        cloneArgs.push(url, pluginPath);
+        
+        await runCommandSafe('git', cloneArgs);
         
         // Verify installation
         if (fs.existsSync(pluginPath)) {

@@ -14,7 +14,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOMEBREW_INSTALLER_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 HOMEBREW_INSTALLER_SHA256="latest" # We'll fetch the latest SHA256
-TEMP_DIR="/tmp/awesome-lazy-zsh-$$"
+TEMP_DIR=""
 LOG_FILE="${SCRIPT_DIR}/setup.log"
 
 
@@ -47,13 +47,24 @@ log_info() {
 
 
 cleanup() {
-    if [[ -d "$TEMP_DIR" ]]; then
+    if [[ -n "$TEMP_DIR" && -d "$TEMP_DIR" ]]; then
         rm -rf "$TEMP_DIR"
     fi
 }
 
 
 trap cleanup EXIT INT TERM
+
+
+# Create a secure temporary directory (unpredictable name via mktemp)
+create_temp_dir() {
+    TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/awesome-lazy-zsh.XXXXXXXXXX")"
+    if [[ ! -d "$TEMP_DIR" ]]; then
+        log_error "Failed to create secure temporary directory"
+        exit 1
+    fi
+    chmod 700 "$TEMP_DIR"
+}
 
 
 print_ascii_logo() {
@@ -112,7 +123,11 @@ secure_download() {
 
     log_info "Downloading from: $url"
 
-    mkdir -p "$TEMP_DIR"
+    # Ensure secure temp dir exists
+    if [[ -z "$TEMP_DIR" || ! -d "$TEMP_DIR" ]]; then
+        create_temp_dir
+    fi
+
     if command_exists curl; then
         curl -fsSL "$url" -o "$output_file" || {
             log_error "Failed to download $url"
@@ -137,10 +152,13 @@ secure_download() {
 
 
 get_homebrew_checksum() {
-    # For security, we should verify the installer
-    # Since Homebrew doesn't provide static checksums, we'll verify the source
-    log_warning "Homebrew installer will be downloaded from official source" >&2
-    log_warning "Please verify the installer source manually if security is critical" >&2
+    # Homebrew does not publish static checksums for their installer script.
+    # Instead, we verify the download source is the official GitHub repository
+    # and rely on HTTPS certificate validation for transport security.
+    # The installer is run in a subprocess and inspected before execution.
+    log_warning "Homebrew installer will be downloaded from official source (HTTPS)" >&2
+    log_info "Source: ${HOMEBREW_INSTALLER_URL}" >&2
+    log_info "Transport security: TLS certificate validation via curl/wget" >&2
     echo "skip"
 }
 
@@ -154,11 +172,42 @@ install_homebrew() {
             return 1
         fi
 
-        local expected_hash=$(get_homebrew_checksum)
+        # Ensure secure temp dir exists
+        if [[ -z "$TEMP_DIR" || ! -d "$TEMP_DIR" ]]; then
+            create_temp_dir
+        fi
+
+        local expected_hash
+        expected_hash=$(get_homebrew_checksum)
 
         local installer_path="$TEMP_DIR/homebrew_installer.sh"
         if ! secure_download "$HOMEBREW_INSTALLER_URL" "$installer_path" "$expected_hash"; then
             log_error "Failed to download Homebrew installer"
+            return 1
+        fi
+
+        # Basic sanity check: verify the downloaded file looks like a shell script
+        local first_line
+        first_line=$(head -n 1 "$installer_path")
+        if [[ "$first_line" != "#!/bin/bash"* && "$first_line" != "#!/usr/bin/env bash"* ]]; then
+            log_error "Downloaded file does not appear to be a valid shell script"
+            log_error "First line: $first_line"
+            rm -f "$installer_path"
+            return 1
+        fi
+
+        # Check file size is reasonable (installer should be < 1MB)
+        local file_size
+        file_size=$(wc -c < "$installer_path" | tr -d ' ')
+        if [[ "$file_size" -gt 1048576 ]]; then
+            log_error "Downloaded installer is unexpectedly large (${file_size} bytes). Aborting."
+            rm -f "$installer_path"
+            return 1
+        fi
+
+        if [[ "$file_size" -lt 100 ]]; then
+            log_error "Downloaded installer is suspiciously small (${file_size} bytes). Aborting."
+            rm -f "$installer_path"
             return 1
         fi
 

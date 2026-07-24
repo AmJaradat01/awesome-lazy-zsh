@@ -116,11 +116,21 @@ async function handleCustomPlugin() {
     
     if (!repo) return;
 
+    // Validate URL before proceeding
+    const { validateRepoUrl, validatePluginName } = await import('./utils/customPlugins.js');
+    const urlCheck = validateRepoUrl(repo);
+    if (!urlCheck.valid) {
+        console.log(chalk.red(`❌ ${urlCheck.reason}`));
+        return;
+    }
+
     // Extract plugin name from URL (last path segment, minus .git)
     const name = path.basename(repo.replace(/\.git$/, ''));
 
-    if (!name || !/^[a-zA-Z0-9_.-]+$/.test(name)) {
-        console.log(chalk.red('❌ Could not extract a valid plugin name from URL'));
+    // Validate extracted plugin name
+    const nameCheck = validatePluginName(name);
+    if (!nameCheck.valid) {
+        console.log(chalk.red(`❌ Could not extract a valid plugin name from URL: ${nameCheck.reason}`));
         return;
     }
 
@@ -128,11 +138,6 @@ async function handleCustomPlugin() {
 
     const success = await installCustomPlugin(name, repo);
     if (success) {
-        // Validate name is safe before writing to .zshrc
-        if (!/^[a-zA-Z0-9_.-]+$/.test(name)) {
-            console.log(chalk.yellow('⚠️ Plugin installed but name contains special characters — not added to .zshrc automatically'));
-            return;
-        }
         // Add to .zshrc plugins array
         const zshrcPath = path.join(os.homedir(), '.zshrc');
         if (fs.existsSync(zshrcPath)) {
@@ -179,7 +184,19 @@ async function installSinglePlugin(pluginName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
-        await runCommandSafe('git', ['clone', repoUrl, pluginPath]);
+        
+        // Parse pinned tag from URL (format: "url#tag")
+        const hashIndex = repoUrl.indexOf('#');
+        const url = hashIndex === -1 ? repoUrl : repoUrl.substring(0, hashIndex);
+        const tag = hashIndex === -1 ? null : repoUrl.substring(hashIndex + 1);
+        
+        const cloneArgs = ['clone', '--depth', '1'];
+        if (tag) {
+            cloneArgs.push('--branch', tag);
+        }
+        cloneArgs.push(url, pluginPath);
+        
+        await runCommandSafe('git', cloneArgs);
 
         if (fs.existsSync(pluginPath)) {
             console.log(chalk.green(`✅ ${pluginName} plugin installed successfully.`));

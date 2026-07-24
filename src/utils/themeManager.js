@@ -40,7 +40,19 @@ async function installTheme(themeName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${themeName} theme...`));
-        const success = await runCommandSafe('git', ['clone', repoUrl, themePath]);
+        
+        // Parse pinned tag from URL (format: "url#tag")
+        const hashIndex = repoUrl.indexOf('#');
+        const url = hashIndex === -1 ? repoUrl : repoUrl.substring(0, hashIndex);
+        const tag = hashIndex === -1 ? null : repoUrl.substring(hashIndex + 1);
+        
+        const cloneArgs = ['clone', '--depth', '1'];
+        if (tag) {
+            cloneArgs.push('--branch', tag);
+        }
+        cloneArgs.push(url, themePath);
+        
+        const success = await runCommandSafe('git', cloneArgs);
         
         if (success && fs.existsSync(themePath)) {
             // Create symlink for Oh My Zsh to find the theme

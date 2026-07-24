@@ -24,21 +24,46 @@ function extractExistingPlugins(zshrcContent) {
 }
 
 /**
+ * Validates a theme name to ensure it's safe for shell interpolation.
+ * Only allows alphanumeric characters, hyphens, and underscores.
+ * @param {string} theme - Theme name to validate
+ * @returns {boolean} True if the theme name is safe
+ */
+function isValidThemeName(theme) {
+    return typeof theme === 'string' &&
+        theme.length > 0 &&
+        theme.length <= 50 &&
+        /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/.test(theme);
+}
+
+/**
  * Generates complete .zshrc configuration
  * @param {string} theme - Selected theme name
  * @param {string[]} plugins - Array of plugin names
  * @returns {Promise<string>} Generated .zshrc content
  */
 export async function generateZshrcContent(theme, plugins = []) {
+    // Validate theme name to prevent shell injection via .zshrc
+    if (!isValidThemeName(theme)) {
+        console.log(chalk.yellow(`⚠️ Invalid theme name "${theme}", falling back to robbyrussell`));
+        theme = 'robbyrussell';
+    }
+
     // Ensure plugins array is not empty, and fall back to default plugins if necessary
     if (!Array.isArray(plugins) || plugins.length === 0) {
         plugins = ['git'];  // Default to 'git' if no plugins are selected
     }
 
-    // Only include real Oh My Zsh plugins (built-in + external), not alias-only ones
+    // Validate each plugin name before interpolating into shell config
+    const safePluginPattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
     const omzPlugins = plugins.filter(p => {
         const repo = pluginRepos[p];
-        return repo !== 'alias-only';
+        if (repo === 'alias-only') return false;
+        if (!safePluginPattern.test(p)) {
+            console.log(chalk.yellow(`⚠️ Skipping plugin with unsafe name: "${p}"`));
+            return false;
+        }
+        return true;
     });
 
     let zshrcContent = `

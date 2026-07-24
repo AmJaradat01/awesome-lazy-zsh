@@ -8,6 +8,9 @@
  * - empty string '' indicates a built-in Oh My Zsh plugin (added to plugins=() array)
  * - 'alias-only' indicates a custom alias plugin (sourced as a file, NOT added to plugins=())
  * - URL string indicates an external plugin to clone
+ *
+ * SECURITY: External plugins are pinned to specific release tags where available.
+ * When updating, verify the new tag exists and review the changelog.
  */
 export const pluginRepos = {
     // Built-in Oh My Zsh plugins
@@ -26,13 +29,13 @@ export const pluginRepos = {
     'node': '',
     'gitfast': '',
     
-    // External plugins (cloned into custom/plugins/)
-    'fzf': 'https://github.com/junegunn/fzf.git',
-    'z': 'https://github.com/agkozak/zsh-z.git',
-    'thefuck': 'https://github.com/nvbn/thefuck.git',
-    'zsh-autocomplete': 'https://github.com/marlonrichert/zsh-autocomplete.git',
-    'zsh-autosuggestions': 'https://github.com/zsh-users/zsh-autosuggestions.git',
-    'zsh-syntax-highlighting': 'https://github.com/zsh-users/zsh-syntax-highlighting.git',
+    // External plugins (cloned into custom/plugins/ at pinned tags)
+    'fzf': 'https://github.com/junegunn/fzf.git#v0.74.1',
+    'z': 'https://github.com/agkozak/zsh-z.git#v2024.7.4',
+    'thefuck': 'https://github.com/nvbn/thefuck.git#3.32',
+    'zsh-autocomplete': 'https://github.com/marlonrichert/zsh-autocomplete.git#23.07.13',
+    'zsh-autosuggestions': 'https://github.com/zsh-users/zsh-autosuggestions.git#v0.7.1',
+    'zsh-syntax-highlighting': 'https://github.com/zsh-users/zsh-syntax-highlighting.git#0.8.0',
     
     // Alias-only plugins (sourced as custom alias files, not Oh My Zsh plugins)
     'mongodb': 'alias-only',
@@ -59,11 +62,15 @@ export const pluginRepos = {
     'history-search': 'alias-only'
 };
 
-/** Theme repository mappings - empty string indicates built-in Oh My Zsh theme */
+/**
+ * Theme repository mappings
+ * - empty string indicates built-in Oh My Zsh theme
+ * - URL#tag format pins to a specific release for supply-chain safety
+ */
 export const themeRepos = {
     'robbyrussell': '',
-    'powerlevel10k': 'https://github.com/romkatv/powerlevel10k.git',
+    'powerlevel10k': 'https://github.com/romkatv/powerlevel10k.git#v1.20.0',
     'agnoster': '',
-    'spaceship': 'https://github.com/spaceship-prompt/spaceship-prompt.git',
-    'starship': 'https://github.com/starship/starship.git'
+    'spaceship': 'https://github.com/spaceship-prompt/spaceship-prompt.git#v4.22.5',
+    'starship': 'https://github.com/starship/starship.git#v1.21.1'
 };

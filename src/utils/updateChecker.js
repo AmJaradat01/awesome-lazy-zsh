@@ -320,6 +320,7 @@ function runCommand(command, cwd) {
  * For 'git': runs `git pull origin master` then `npm install`.
  * For 'brew': runs `brew upgrade awesome-lazy-zsh`.
  * Displays progress with chalk styling and handles failures gracefully.
+ * Requires explicit user confirmation before executing.
  * @param {'git'|'brew'} installMethod - The installation method.
  * @returns {Promise<{success: boolean, message: string}>} Result of the update operation.
  */
@@ -331,6 +332,19 @@ export async function performUpdate(installMethod) {
     try {
         if (installMethod === 'git') {
             console.log(chalk.blue('📦 Updating via git pull...'));
+
+            // Verify we're pulling from the expected remote
+            const remoteResult = await runCommand('git remote get-url origin', projectRoot);
+            if (remoteResult.success) {
+                const remoteUrl = remoteResult.output.trim();
+                const expectedRepo = 'AmJaradat01/awesome-lazy-zsh';
+                if (!remoteUrl.includes(expectedRepo)) {
+                    console.log(chalk.red(`❌ Unexpected git remote: ${remoteUrl}`));
+                    console.log(chalk.red(`   Expected remote to contain: ${expectedRepo}`));
+                    return { success: false, message: `Unexpected git remote: ${remoteUrl}. Aborting for safety.` };
+                }
+            }
+
             const pullResult = await runCommand('git pull origin master', projectRoot);
             if (!pullResult.success) {
                 console.log(chalk.red(`❌ git pull failed: ${pullResult.output}`));
@@ -339,7 +353,7 @@ export async function performUpdate(installMethod) {
             console.log(chalk.green('✅ Code updated successfully.'));
 
             console.log(chalk.blue('📦 Installing dependencies...'));
-            const npmResult = await runCommand('npm install', projectRoot);
+            const npmResult = await runCommand('npm install --ignore-scripts', projectRoot);
             if (!npmResult.success) {
                 console.log(chalk.yellow(`⚠️ npm install failed: ${npmResult.output}`));
                 // Still consider it a success since code was pulled
