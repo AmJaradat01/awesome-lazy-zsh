@@ -58,7 +58,7 @@ trap cleanup EXIT INT TERM
 
 print_ascii_logo() {
     local version
-    version=$(node -e "import fs from 'fs';const p=JSON.parse(fs.readFileSync('${SCRIPT_DIR}/package.json','utf8'));console.log(p.version)" 2>/dev/null || echo "")
+    version=$(SCRIPT_DIR="$SCRIPT_DIR" node -e "import fs from 'fs';const p=JSON.parse(fs.readFileSync(process.env.SCRIPT_DIR+'/package.json','utf8'));console.log(p.version)" 2>/dev/null || echo "")
     echo -e "${GREEN}     _                                               _                         _____    _     ";
     echo -e "    / \__      _____  ___  ___  _ __ ___   ___      | |    __ _ _____   _     |__  /___| |__  ";
     echo -e "   / _ \ \ /\ / / _ \/ __|/ _ \| '_ \` _ \ / _ \_____| |   / _\` |_  / | | |_____ / // __| '_ \ ";

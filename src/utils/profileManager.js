@@ -28,12 +28,19 @@ export function ensureProfilesDir() {
  * @param {Object} customRepos - Custom plugin repositories
  */
 export function saveProfile(name, plugins, theme, customRepos = {}) {
+    // Validate profile name to prevent path traversal
+    if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+        console.error(chalk.red('❌ Invalid profile name. Use only letters, numbers, hyphens, and underscores.'));
+        return;
+    }
+
     ensureProfilesDir();
     const profile = { plugins, theme, customRepos, created: new Date().toISOString() };
     
     fs.writeFileSync(
         path.join(PROFILES_DIR, `${name}.json`),
-        JSON.stringify(profile, null, 2)
+        JSON.stringify(profile, null, 2),
+        { mode: 0o600 }
     );
     
     console.log(chalk.green(`✅ Profile '${name}' saved`));
@@ -45,6 +52,12 @@ export function saveProfile(name, plugins, theme, customRepos = {}) {
  * @returns {Object|null} Profile data or null if not found
  */
 export function loadProfile(name) {
+    // Validate profile name to prevent path traversal
+    if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+        console.error(chalk.red('❌ Invalid profile name'));
+        return null;
+    }
+
     const profilePath = path.join(PROFILES_DIR, `${name}.json`);
     
     if (!fs.existsSync(profilePath)) {

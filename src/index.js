@@ -117,10 +117,10 @@ async function handleCustomPlugin() {
     if (!repo) return;
 
     // Extract plugin name from URL (last path segment, minus .git)
-    const name = repo.replace(/\.git$/, '').split('/').pop();
+    const name = path.basename(repo.replace(/\.git$/, ''));
 
-    if (!name) {
-        console.log(chalk.red('❌ Could not extract plugin name from URL'));
+    if (!name || !/^[a-zA-Z0-9_.-]+$/.test(name)) {
+        console.log(chalk.red('❌ Could not extract a valid plugin name from URL'));
         return;
     }
 
@@ -128,6 +128,11 @@ async function handleCustomPlugin() {
 
     const success = await installCustomPlugin(name, repo);
     if (success) {
+        // Validate name is safe before writing to .zshrc
+        if (!/^[a-zA-Z0-9_.-]+$/.test(name)) {
+            console.log(chalk.yellow('⚠️ Plugin installed but name contains special characters — not added to .zshrc automatically'));
+            return;
+        }
         // Add to .zshrc plugins array
         const zshrcPath = path.join(os.homedir(), '.zshrc');
         if (fs.existsSync(zshrcPath)) {

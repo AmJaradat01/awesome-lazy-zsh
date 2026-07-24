@@ -67,7 +67,7 @@ export function writeState(partialState) {
             timestamp: Date.now()
         };
         const tmpPath = STATE_FILE_PATH + '.tmp';
-        fs.writeFileSync(tmpPath, JSON.stringify(merged, null, 2), 'utf8');
+        fs.writeFileSync(tmpPath, JSON.stringify(merged, null, 2), { encoding: 'utf8', mode: 0o600 });
         fs.renameSync(tmpPath, STATE_FILE_PATH);
     } catch (error) {
         console.log(chalk.yellow(`⚠️ Warning: Could not save setup state: ${error.message}`));

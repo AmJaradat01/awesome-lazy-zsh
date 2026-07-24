@@ -162,7 +162,7 @@ export function writeCache(cache) {
             skippedVersion: cache.skippedVersion || null
         };
         const tmpPath = CACHE_FILE_PATH + '.tmp';
-        fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf8');
+        fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), { encoding: 'utf8', mode: 0o600 });
         fs.renameSync(tmpPath, CACHE_FILE_PATH);
     } catch {
         // Fail silently — no logging, no throwing
