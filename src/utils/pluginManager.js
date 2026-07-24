@@ -5,6 +5,7 @@
 
 import { getUserSelection } from '../prompts.js';
 import { runCommand } from './commands.js';
+import { execFileSync } from 'child_process';
 import { updateZshrc } from './zshrcManager.js';
 import { runServiceInstallation } from './serviceInstallFlow.js';
 import { pluginRepos } from './config.js';
@@ -40,7 +41,12 @@ async function installPlugin(pluginName) {
         return true;
     }
 
-    const pluginPath = path.join(os.homedir(), `.oh-my-zsh/custom/plugins/${pluginName}`);
+    if (!/^[a-zA-Z0-9_-]+$/.test(pluginName)) {
+        console.error(chalk.red(`❌ Invalid plugin name: ${pluginName}`));
+        return false;
+    }
+    const pluginsBaseDir = path.join(os.homedir(), '.oh-my-zsh', 'custom', 'plugins');
+    const pluginPath = pluginsBaseDir + '/' + pluginName;
 
     if (fs.existsSync(pluginPath)) {
         console.log(chalk.blue(`ℹ️ ${pluginName} plugin is already installed.`));
@@ -49,7 +55,7 @@ async function installPlugin(pluginName) {
 
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
-        await runCommand(`git clone ${repoUrl} ${pluginPath}`);
+        execFileSync('git', ['clone', repoUrl, pluginPath], { stdio: 'inherit', timeout: 60000 });
         
         // Verify installation
         if (fs.existsSync(pluginPath)) {
