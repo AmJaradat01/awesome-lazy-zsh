@@ -81,7 +81,24 @@ async function handleProfileManagement() {
     } else if (action === 'save') {
         const { name } = await prompts({ type: 'text', name: 'name', message: 'Profile name:' });
         if (name) {
-            saveProfile(name, ['git'], 'robbyrussell');
+            // Read current plugins and theme from .zshrc
+            const zshrcPath = path.join(os.homedir(), '.zshrc');
+            let plugins = ['git'];
+            let theme = 'robbyrussell';
+            
+            if (fs.existsSync(zshrcPath)) {
+                const content = fs.readFileSync(zshrcPath, 'utf8');
+                const pluginMatch = content.match(/plugins=\(([^)]+)\)/);
+                if (pluginMatch && pluginMatch[1]) {
+                    plugins = pluginMatch[1].split(/\s+/).filter(Boolean);
+                }
+                const themeMatch = content.match(/ZSH_THEME="([^"]+)"/);
+                if (themeMatch && themeMatch[1]) {
+                    theme = themeMatch[1];
+                }
+            }
+            
+            saveProfile(name, plugins, theme);
         }
     } else if (action === 'list') {
         const profiles = listProfiles();
