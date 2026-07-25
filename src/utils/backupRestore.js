@@ -7,53 +7,49 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import prompts from 'prompts';
+import { backupExistingZshrc, listBackups } from './zshrcManager.js';
+
+// Unified backup directory - same as zshrcManager
+const BACKUP_DIR = path.join(os.homedir(), '.awesome-lazy-zsh', 'backups');
 
 /**
  * Ensures backup directory exists with restrictive permissions
  * @returns {string} Backup directory path
  */
 function ensureBackupFolderExists() {
-    const backupFolder = path.join(os.homedir(), '.awesome-lazy-zsh_backup');
-    if (!fs.existsSync(backupFolder)) {
+    if (!fs.existsSync(BACKUP_DIR)) {
         try {
-            fs.mkdirSync(backupFolder, { recursive: true, mode: 0o700 });
-            console.log(`✅ Backup folder created at: ${backupFolder}`);
+            fs.mkdirSync(BACKUP_DIR, { recursive: true, mode: 0o700 });
+            console.log(`Backup folder created at: ${BACKUP_DIR}`);
         } catch (error) {
-            console.error(`❌ Error creating backup folder: ${error.message}`);
+            console.error(`Error creating backup folder: ${error.message}`);
             throw error;
         }
     }
-    return backupFolder;
+    return BACKUP_DIR;
 }
 
 /**
  * Creates timestamped backup of current .zshrc
  */
 export function backupZshrc() {
-    const homeDir = os.homedir();
-    const zshrcPath = path.join(homeDir, '.zshrc');
-    const backupFolder = ensureBackupFolderExists();
-    const backupPath = path.join(backupFolder, `.zshrc.backup.${Date.now()}`);
-
+    const zshrcPath = path.join(os.homedir(), '.zshrc');
+    
     try {
-        if (fs.existsSync(zshrcPath)) {
-            const zshrcContent = fs.readFileSync(zshrcPath, 'utf8');
-            fs.writeFileSync(backupPath, zshrcContent, { encoding: 'utf8', mode: 0o600 });
-            
+        const backupPath = backupExistingZshrc(zshrcPath);
+        if (backupPath) {
             // Verify backup was created successfully
             const backupContent = fs.readFileSync(backupPath, 'utf8');
             if (backupContent.length === 0) {
-                console.error('❌ Warning: Backup file is empty!');
+                console.error('Warning: Backup file is empty!');
             } else {
-                console.log(`✅ Backup verified: ${backupContent.length} characters`);
+                console.log(`Backup verified: ${backupContent.length} characters`);
             }
-            
-            console.log(`✅ Backup created at: ${backupPath}`);
         } else {
-            console.log('❌ No .zshrc file found to backup.');
+            console.log('No .zshrc file found to backup.');
         }
     } catch (error) {
-        console.error(`❌ Error during backup: ${error.message}`);
+        console.error(`Error during backup: ${error.message}`);
     }
 }
 
@@ -61,22 +57,33 @@ export function backupZshrc() {
  * Interactive .zshrc restoration from backup
  */
 export async function restoreZshrc() {
-    const backupFolder = ensureBackupFolderExists();
+    ensureBackupFolderExists();
 
-    // Retrieve a list of available backup files
-    const backups = fs.readdirSync(backupFolder).filter(file => file.startsWith('.zshrc.backup.'));
+    // Get all available backups from unified directory
+    const backups = listBackups();
 
     if (backups.length === 0) {
-        console.log('❌ No backups found.');
+        console.log('No backups found.');
         return;
     }
+
+    // Format backup choices with timestamps
+    const choices = backups.map(backupPath => {
+        const filename = path.basename(backupPath);
+        const timestamp = parseInt(filename.split('.').pop(), 10);
+        const date = new Date(timestamp);
+        return {
+            title: `${filename} (${date.toLocaleString()})`,
+            value: backupPath
+        };
+    });
 
     // Prompt the user to select a backup file to restore
     const { selectedBackup } = await prompts({
         type: 'select',
         name: 'selectedBackup',
         message: 'Select a backup file to restore:',
-        choices: backups.map(file => ({ title: file, value: path.join(backupFolder, file) }))
+        choices
     });
 
     if (selectedBackup) {
@@ -84,24 +91,34 @@ export async function restoreZshrc() {
         const { confirmRestore } = await prompts({
             type: 'confirm',
             name: 'confirmRestore',
-            message: `Are you sure you want to restore from ${selectedBackup}?`,
+            message: `Are you sure you want to restore from ${path.basename(selectedBackup)}?`,
             initial: true
         });
 
         if (confirmRestore) {
             try {
                 const zshrcPath = path.join(os.homedir(), '.zshrc');
+                
+                // Create a safety backup of current .zshrc before restoring
+                if (fs.existsSync(zshrcPath)) {
+                    const safetyBackup = backupExistingZshrc(zshrcPath);
+                    if (safetyBackup) {
+                        console.log(`Safety backup created: ${safetyBackup}`);
+                    }
+                }
+                
+                // Restore from selected backup
                 const backupContent = fs.readFileSync(selectedBackup, 'utf8');
                 fs.writeFileSync(zshrcPath, backupContent, { encoding: 'utf8', mode: 0o600 });
-                console.log(`✅ .zshrc restored from backup: ${selectedBackup}`);
+                console.log(`.zshrc restored from backup: ${selectedBackup}`);
             } catch (error) {
-                console.error(`❌ Error during restoration: ${error.message}`);
+                console.error(`Error during restoration: ${error.message}`);
             }
         } else {
-            console.log('⚠️ Restore operation cancelled by the user.');
+            console.log('Restore operation cancelled by the user.');
         }
     } else {
-        console.log('⚠️ No backup selected. Restore operation cancelled.');
+        console.log('No backup selected. Restore operation cancelled.');
     }
 }
 

@@ -31,7 +31,7 @@ export const pluginRepos = {
     
     // External plugins (cloned into custom/plugins/ at pinned tags)
     'fzf': 'https://github.com/junegunn/fzf.git#v0.74.1',
-    'z': 'https://github.com/agkozak/zsh-z.git#v2024.7.4',
+    'z': 'https://github.com/agkozak/zsh-z.git#acd0e1984df350c189f8f9c4956ec586b6c73fca',
     'thefuck': 'https://github.com/nvbn/thefuck.git#3.32',
     'zsh-autocomplete': 'https://github.com/marlonrichert/zsh-autocomplete.git#23.07.13',
     'zsh-autosuggestions': 'https://github.com/zsh-users/zsh-autosuggestions.git#v0.7.1',

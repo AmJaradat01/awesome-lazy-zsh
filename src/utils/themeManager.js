@@ -41,18 +41,31 @@ async function installTheme(themeName) {
     try {
         console.log(chalk.yellow(`⚠️ Installing ${themeName} theme...`));
         
-        // Parse pinned tag from URL (format: "url#tag")
+        // Parse pinned ref from URL (format: "url#tag" or "url#commitSha")
         const hashIndex = repoUrl.indexOf('#');
         const url = hashIndex === -1 ? repoUrl : repoUrl.substring(0, hashIndex);
-        const tag = hashIndex === -1 ? null : repoUrl.substring(hashIndex + 1);
+        const ref = hashIndex === -1 ? null : repoUrl.substring(hashIndex + 1);
+        // Detect if ref looks like a commit SHA (40 hex characters)
+        const isCommitSha = ref && /^[a-f0-9]{40}$/i.test(ref);
         
-        const cloneArgs = ['clone', '--depth', '1'];
-        if (tag) {
-            cloneArgs.push('--branch', tag);
+        let success;
+        if (isCommitSha) {
+            // For commit SHAs: clone without depth limit, then checkout
+            const cloneArgs = ['clone', url, themePath];
+            success = await runCommandSafe('git', cloneArgs);
+            
+            if (success && fs.existsSync(themePath)) {
+                await runCommandSafe('git', ['checkout', ref], { cwd: themePath });
+            }
+        } else {
+            // For tags/branches: use --depth 1 --branch
+            const cloneArgs = ['clone', '--depth', '1'];
+            if (ref) {
+                cloneArgs.push('--branch', ref);
+            }
+            cloneArgs.push(url, themePath);
+            success = await runCommandSafe('git', cloneArgs);
         }
-        cloneArgs.push(url, themePath);
-        
-        const success = await runCommandSafe('git', cloneArgs);
         
         if (success && fs.existsSync(themePath)) {
             // Create symlink for Oh My Zsh to find the theme

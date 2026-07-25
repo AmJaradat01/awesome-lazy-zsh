@@ -4,12 +4,24 @@ on:
   release:
     types: [published]
 
+# Prevent concurrent runs to avoid race conditions on formula updates
+concurrency:
+  group: homebrew-formula-update
+  cancel-in-progress: false
+
+# Explicit minimal permissions - only what's needed
+permissions:
+  contents: read
+
 jobs:
   update-homebrew:
     runs-on: ubuntu-latest
+    # Use a protected environment for release operations
+    environment: release
     steps:
       - name: Checkout homebrew tap
-        uses: actions/checkout@v4
+        # Pinned to full SHA for supply-chain security (v4.4.0)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: AmJaradat01/homebrew-awesome-lazy-zsh
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
@@ -19,10 +31,31 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: |
+          set -euo pipefail
+          
           TARBALL_URL="https://github.com/AmJaradat01/awesome-lazy-zsh/archive/refs/tags/${TAG}.tar.gz"
-          SHA256=$(curl -sL "$TARBALL_URL" | shasum -a 256 | cut -d ' ' -f 1)
+          
+          # Download with -f to fail on HTTP errors (4xx, 5xx)
+          # Use temp file to avoid hashing error pages
+          TEMP_FILE=$(mktemp)
+          if ! curl -fsSL "$TARBALL_URL" -o "$TEMP_FILE"; then
+            echo "::error::Failed to download tarball from $TARBALL_URL"
+            rm -f "$TEMP_FILE"
+            exit 1
+          fi
+          
+          SHA256=$(shasum -a 256 "$TEMP_FILE" | cut -d ' ' -f 1)
+          rm -f "$TEMP_FILE"
+          
+          # Validate SHA256 is exactly 64 hex characters
+          if ! echo "$SHA256" | grep -qE '^[a-f0-9]{64}$'; then
+            echo "::error::Invalid SHA256 format: $SHA256"
+            exit 1
+          fi
           
           cd homebrew-tap/Formula
+          
+          # Update formula with validated values
           sed -i "s|url \".*\"|url \"${TARBALL_URL}\"|" awesome-lazy-zsh.rb
           sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|" awesome-lazy-zsh.rb
           
@@ -33,10 +66,18 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: |
+          set -euo pipefail
+          
           cd homebrew-tap
-          git config user.name "Ali M. Jaradat"
-          git config user.email "amjaradat01@gmail.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/awesome-lazy-zsh.rb
-          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
           git commit -m "chore: bump formula to ${TAG}"
           git push

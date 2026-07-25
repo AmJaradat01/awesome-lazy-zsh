@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.4] - 2026-07-24
+
+### Security
+- **Comprehensive external security audit remediation**
+  - Fix Oh My Zsh installer: add `--unattended --keep-zshrc` flags and pass `RUNZSH=no CHSH=no` environment variables
+  - Fix z plugin: pin to commit SHA (repo has no tags) instead of non-existent tag
+  - Pin all GitHub Actions to full commit SHAs for supply-chain security
+  - Fix workflow: add `curl -f` flag, SHA256 format validation, explicit permissions, concurrency protection
+  - Rewrite `.zshrc` handling with managed-block approach to preserve user customizations
+  - Use atomic writes (temp file + rename) to prevent file corruption
+  - Use stable `/opt/homebrew/opt/` symlink paths instead of versioned Cellar paths
+  - Unify backup directory at `~/.awesome-lazy-zsh/backups/`
+  - Create safety backup before restore operations
+
+### Added
+- **SECURITY.md** - Vulnerability reporting policy and security documentation
+- **Dependabot configuration** - Automated dependency updates for npm and GitHub Actions
+- **CI workflow** - Tests on Node 18/20/22, JavaScript syntax checking, ShellCheck linting, npm audit
+
+### Changed
+- Support commit SHA refs (40 hex chars) in plugin/theme URLs, not just tags
+- Update `runCommandSafe` to support custom environment variables
+- Backups now stored in unified `~/.awesome-lazy-zsh/backups/` directory
+
+### Removed
+- Stale v3.1.7 formula from main repo (actual formula is in tap repository)
+
 ## [3.4.3] - 2026-07-24
 
 ### Security

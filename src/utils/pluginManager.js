@@ -23,19 +23,23 @@ const defaultPlugins = [
 ];
 
 /**
- * Parses a plugin repo URL that may contain a pinned tag/branch reference.
- * Format: "https://github.com/user/repo.git#v1.2.3"
- * @param {string} repoUrl - Repository URL potentially with #tag suffix
- * @returns {{url: string, tag: string|null}} Parsed URL and optional tag
+ * Parses a plugin repo URL that may contain a pinned tag/branch/SHA reference.
+ * Format: "https://github.com/user/repo.git#v1.2.3" (tag) or "...#abc123def..." (SHA)
+ * @param {string} repoUrl - Repository URL potentially with #ref suffix
+ * @returns {{url: string, ref: string|null, isCommitSha: boolean}} Parsed URL, optional ref, and whether it's a SHA
  */
 function parseRepoUrl(repoUrl) {
     const hashIndex = repoUrl.indexOf('#');
     if (hashIndex === -1) {
-        return { url: repoUrl, tag: null };
+        return { url: repoUrl, ref: null, isCommitSha: false };
     }
+    const ref = repoUrl.substring(hashIndex + 1);
+    // Detect if ref looks like a commit SHA (40 hex characters)
+    const isCommitSha = /^[a-f0-9]{40}$/i.test(ref);
     return {
         url: repoUrl.substring(0, hashIndex),
-        tag: repoUrl.substring(hashIndex + 1)
+        ref,
+        isCommitSha
     };
 }
 
@@ -67,14 +71,26 @@ async function installPlugin(pluginName) {
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
         
-        const { url, tag } = parseRepoUrl(repoUrl);
-        const cloneArgs = ['clone', '--depth', '1'];
-        if (tag) {
-            cloneArgs.push('--branch', tag);
-        }
-        cloneArgs.push(url, pluginPath);
+        const { url, ref, isCommitSha } = parseRepoUrl(repoUrl);
         
-        await runCommandSafe('git', cloneArgs);
+        if (isCommitSha) {
+            // For commit SHAs: clone without depth limit (need history to checkout SHA), then checkout
+            const cloneArgs = ['clone', url, pluginPath];
+            await runCommandSafe('git', cloneArgs);
+            
+            if (fs.existsSync(pluginPath)) {
+                // Checkout the specific commit
+                await runCommandSafe('git', ['checkout', ref], { cwd: pluginPath });
+            }
+        } else {
+            // For tags/branches: use --depth 1 --branch
+            const cloneArgs = ['clone', '--depth', '1'];
+            if (ref) {
+                cloneArgs.push('--branch', ref);
+            }
+            cloneArgs.push(url, pluginPath);
+            await runCommandSafe('git', cloneArgs);
+        }
         
         // Verify installation
         if (fs.existsSync(pluginPath)) {

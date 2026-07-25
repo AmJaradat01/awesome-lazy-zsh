@@ -36,7 +36,7 @@ export function runCommand(command) {
  * Uses execFileSync with an argument array — immune to command injection.
  * @param {string} binary - The binary to execute (e.g., 'git')
  * @param {string[]} args - Array of arguments (never concatenated into a shell string)
- * @param {Object} [options] - Optional options (cwd, timeout)
+ * @param {Object} [options] - Optional options (cwd, timeout, env)
  * @returns {Promise<boolean>} Command execution success status
  */
 export function runCommandSafe(binary, args, options = {}) {
@@ -47,7 +47,8 @@ export function runCommandSafe(binary, args, options = {}) {
             execFileSync(binary, args, {
                 stdio: 'inherit',
                 timeout: options.timeout || 60000,
-                cwd: options.cwd || undefined
+                cwd: options.cwd || undefined,
+                env: options.env || process.env
             });
             console.log(chalk.green(`✅ Command executed successfully`));
             resolve(true);

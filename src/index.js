@@ -71,9 +71,16 @@ async function ensureOhMyZshInstalled() {
                 return false;
             }
 
-            // Execute the validated installer (RUNZSH=no prevents it from launching zsh)
+            // Execute the validated installer with --unattended --keep-zshrc flags
+            // --unattended: non-interactive mode, no prompts
+            // --keep-zshrc: preserve existing .zshrc instead of overwriting
+            // RUNZSH=no: prevent launching zsh after install
+            // CHSH=no: don't change default shell
             fs.chmodSync(installerPath, 0o700);
-            const success = await runCommandSafe('sh', [installerPath], { timeout: 120000 });
+            const success = await runCommandSafe('sh', [installerPath, '--unattended', '--keep-zshrc'], {
+                timeout: 120000,
+                env: { ...process.env, RUNZSH: 'no', CHSH: 'no' }
+            });
 
             if (!success || !fs.existsSync(ohMyZshPath)) {
                 console.error(chalk.red('❌ Failed to install Oh My Zsh. Please install it manually.'));
@@ -229,18 +236,30 @@ async function installSinglePlugin(pluginName) {
     try {
         console.log(chalk.yellow(`⚠️ Installing ${pluginName} plugin...`));
         
-        // Parse pinned tag from URL (format: "url#tag")
+        // Parse pinned ref from URL (format: "url#tag" or "url#commitSha")
         const hashIndex = repoUrl.indexOf('#');
         const url = hashIndex === -1 ? repoUrl : repoUrl.substring(0, hashIndex);
-        const tag = hashIndex === -1 ? null : repoUrl.substring(hashIndex + 1);
+        const ref = hashIndex === -1 ? null : repoUrl.substring(hashIndex + 1);
+        // Detect if ref looks like a commit SHA (40 hex characters)
+        const isCommitSha = ref && /^[a-f0-9]{40}$/i.test(ref);
         
-        const cloneArgs = ['clone', '--depth', '1'];
-        if (tag) {
-            cloneArgs.push('--branch', tag);
+        if (isCommitSha) {
+            // For commit SHAs: clone without depth limit, then checkout
+            const cloneArgs = ['clone', url, pluginPath];
+            await runCommandSafe('git', cloneArgs);
+            
+            if (fs.existsSync(pluginPath)) {
+                await runCommandSafe('git', ['checkout', ref], { cwd: pluginPath });
+            }
+        } else {
+            // For tags/branches: use --depth 1 --branch
+            const cloneArgs = ['clone', '--depth', '1'];
+            if (ref) {
+                cloneArgs.push('--branch', ref);
+            }
+            cloneArgs.push(url, pluginPath);
+            await runCommandSafe('git', cloneArgs);
         }
-        cloneArgs.push(url, pluginPath);
-        
-        await runCommandSafe('git', cloneArgs);
 
         if (fs.existsSync(pluginPath)) {
             console.log(chalk.green(`✅ ${pluginName} plugin installed successfully.`));
