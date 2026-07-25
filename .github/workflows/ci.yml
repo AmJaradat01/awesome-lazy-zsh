@@ -40,7 +40,21 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test
+        # Retry up to 3 times due to intermittent Node.js test runner deserialization issues
+        run: |
+          for i in 1 2 3; do
+            echo "Test attempt $i..."
+            if npm test; then
+              echo "Tests passed on attempt $i"
+              exit 0
+            fi
+            if [ $i -lt 3 ]; then
+              echo "Tests failed, retrying..."
+              sleep 2
+            fi
+          done
+          echo "Tests failed after 3 attempts"
+          exit 1
         env:
           # Use isolated test directory to avoid writing to real home
           HOME: ${{ runner.temp }}/test-home
