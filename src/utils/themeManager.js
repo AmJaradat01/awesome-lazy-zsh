@@ -19,6 +19,16 @@ import { writeState } from './stateManager.js';
  */
 async function installTheme(themeName) {
     const repoUrl = themeRepos[themeName];
+
+    if (themeName === 'starship') {
+        const alreadyInstalled = await runCommandSafe('sh', ['-c', 'command -v starship >/dev/null 2>&1']);
+        if (alreadyInstalled) return true;
+        const installed = await runCommandSafe('brew', ['install', 'starship']);
+        if (!installed) {
+            console.error(chalk.red('❌ Starship is not installed. Install the signed package with your system package manager.'));
+        }
+        return installed;
+    }
     
     if (!repoUrl || repoUrl === '') {
         console.log(chalk.blue(`ℹ️ ${themeName} is a built-in Oh My Zsh theme.`));

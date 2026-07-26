@@ -48,7 +48,7 @@ function parseRepoUrl(repoUrl) {
  * @param {string} pluginName - Plugin name to install
  * @returns {Promise<boolean>} Installation success status
  */
-async function installPlugin(pluginName) {
+export async function installPlugin(pluginName) {
     const repoUrl = pluginRepos[pluginName];
     
     if (!repoUrl || repoUrl === '') {
@@ -83,8 +83,8 @@ async function installPlugin(pluginName) {
                 await runCommandSafe('git', ['checkout', ref], { cwd: pluginPath });
             }
         } else {
-            // For tags/branches: use --depth 1 --branch
-            const cloneArgs = ['clone', '--depth', '1'];
+            // Keep history so verified updates and rollback remain possible.
+            const cloneArgs = ['clone'];
             if (ref) {
                 cloneArgs.push('--branch', ref);
             }

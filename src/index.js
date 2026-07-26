@@ -11,9 +11,9 @@ import { chooseTheme, applyDefaultTheme } from './utils/themeManager.js';
 import { runCommandSafe } from './utils/commands.js';
 import { updateAllPlugins } from './utils/updateManager.js';
 import { saveProfile, listProfiles, switchProfile } from './utils/profileManager.js';
-import { installCustomPlugin } from './utils/customPlugins.js';
+import { installCustomPlugin, loadCustomPlugins } from './utils/customPlugins.js';
 import { readState, writeState, deleteState, validateState, isExpired } from './utils/stateManager.js';
-import { updateZshrc } from './utils/zshrcManager.js';
+import { updateZshrc, extractExistingPlugins } from './utils/zshrcManager.js';
 import { pluginRepos } from './utils/config.js';
 import { runServiceInstallation } from './utils/serviceInstallFlow.js';
 import { checkForUpdate, performUpdate, writeCache, readCache } from './utils/updateChecker.js';
@@ -37,7 +37,9 @@ async function ensureOhMyZshInstalled() {
     if (!fs.existsSync(ohMyZshPath)) {
         console.log(chalk.yellow('⚠️ Oh My Zsh is not installed. Installing...'));
 
-        const installerUrl = 'https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh';
+        const installerCommit = 'b37dd49ca5bfe0d99b35607637152cb8cc8b29d7';
+        const installerSha256 = '95118b50d062198597e2b73d3a57b609fd95ca68cdc86faf4460d955f0172b61';
+        const installerUrl = `https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/${installerCommit}/tools/install.sh`;
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'awesome-lazy-zsh-'));
         const installerPath = path.join(tmpDir, 'install.sh');
 
@@ -51,6 +53,12 @@ async function ensureOhMyZshInstalled() {
 
             // Validate: must be a shell script
             const content = fs.readFileSync(installerPath, 'utf8');
+            const { createHash } = await import('crypto');
+            const actualSha256 = createHash('sha256').update(content).digest('hex');
+            if (actualSha256 !== installerSha256) {
+                console.error(chalk.red('❌ Oh My Zsh installer checksum mismatch.'));
+                return false;
+            }
             const firstLine = content.split('\n')[0];
             if (!firstLine.startsWith('#!/') || !firstLine.includes('sh')) {
                 console.error(chalk.red('❌ Downloaded file does not appear to be a valid shell script.'));
@@ -139,17 +147,16 @@ async function handleProfileManagement() {
             
             if (fs.existsSync(zshrcPath)) {
                 const content = fs.readFileSync(zshrcPath, 'utf8');
-                const pluginMatch = content.match(/plugins=\(([^)]+)\)/);
-                if (pluginMatch && pluginMatch[1]) {
-                    plugins = pluginMatch[1].split(/\s+/).filter(Boolean);
-                }
+                plugins = extractExistingPlugins(content);
                 const themeMatch = content.match(/ZSH_THEME="([^"]+)"/);
                 if (themeMatch && themeMatch[1]) {
                     theme = themeMatch[1];
                 }
             }
             
-            saveProfile(name, plugins, theme);
+            const allCustomRepos = loadCustomPlugins();
+            const customRepos = Object.fromEntries(Object.entries(allCustomRepos).filter(([plugin]) => plugins.includes(plugin)));
+            saveProfile(name, plugins, theme, customRepos);
         }
     } else if (action === 'list') {
         const profiles = listProfiles();
@@ -286,7 +293,7 @@ async function resumeFromCheckpoint(state) {
     try {
         if (checkpoint === 'plugin_selection') {
             // Install pending plugins
-            const pending = state.pendingPlugins || [];
+            const pending = [...(state.pendingPlugins || [])];
             const installed = [...(state.installedPlugins || [])];
 
             if (pending.length > 0) {
@@ -295,10 +302,12 @@ async function resumeFromCheckpoint(state) {
                 for (const plugin of pending) {
                     const success = await installSinglePlugin(plugin);
                     if (success) {
-                        installed.push(plugin);
+                        if (!installed.includes(plugin)) installed.push(plugin);
+                        const index = pending.indexOf(plugin);
+                        if (index !== -1) pending.splice(index, 1);
                         writeState({
                             installedPlugins: installed,
-                            pendingPlugins: pending.filter(p => p !== plugin)
+                            pendingPlugins: [...pending]
                         });
                     } else {
                         console.log(chalk.yellow(`⚠️ Skipping ${plugin}, will continue with remaining plugins.`));
@@ -341,8 +350,13 @@ async function resumeFromCheckpoint(state) {
             separator();
 
         } else if (checkpoint === 'service_installation') {
-            // Skip plugins and services, go to theme selection
+            // Continue only the services that were not completed.
             const installed = state.installedPlugins || [];
+
+            if ((state.pendingServices || []).length > 0) {
+                await runServiceInstallation(installed, state);
+                separator();
+            }
 
             console.log(chalk.bold.cyan('🎨 Proceeding to theme selection...'));
             await chooseTheme(installed);
@@ -385,6 +399,26 @@ async function main() {
         const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
         const version = pkg.version;
 
+        if (process.argv.includes('--version')) {
+            console.log(version);
+            return;
+        }
+        if (process.argv.includes('--doctor')) {
+            const checks = [
+                ['node', process.execPath],
+                ['zsh', 'zsh'],
+                ['git', 'git']
+            ];
+            let healthy = true;
+            for (const [name, command] of checks) {
+                const available = command.includes('/') ? fs.existsSync(command) : await runCommandSafe('sh', ['-c', `command -v ${command}`]);
+                console.log(`${available ? 'OK' : 'MISSING'} ${name}`);
+                healthy &&= Boolean(available);
+            }
+            if (!healthy) process.exitCode = 1;
+            return;
+        }
+
         separator();
 
         // Update check
@@ -392,7 +426,7 @@ async function main() {
         if (updateResult && updateResult.updateAvailable && !updateResult.skipped) {
             const choice = await promptUpdate(updateResult);
             if (choice === 'yes') {
-                const result = await performUpdate(updateResult.installMethod);
+                const result = await performUpdate(updateResult.installMethod, updateResult.latestVersion);
                 if (result.success) {
                     console.log(chalk.green.bold('\n✅ Updated successfully! Please re-run awesome-lazy-zsh.\n'));
                     process.exit(0);

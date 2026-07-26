@@ -1,6 +1,6 @@
 # Awesome Lazy Zsh
 
-![Version](https://img.shields.io/badge/version-v3.4.4-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D18-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
+![Version](https://img.shields.io/badge/version-v3.4.5-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
 
 **The easiest way to set up and manage your Zsh environment**
 
@@ -13,7 +13,7 @@ Awesome-Lazy-Zsh automates your Zsh setup with 42 plugins, 5 themes, configurati
 - **5 Themes** — Spaceship, Powerlevel10k, Starship, Agnoster, Robbyrussell
 - **Backup & Restore** — automatic `.zshrc` backups before any changes
 - **Interactive CLI** — guided setup wizard with multi-select menus
-- **Auto Dependencies** — installs Git, Node.js, Homebrew, fzf automatically
+- **Verified Dependencies** — uses declared Homebrew dependencies and reproducible npm installs
 - **Configuration Profiles** — save, switch, and manage different setups
 - **Custom Plugins** — add plugins from any Git repository
 
@@ -84,7 +84,7 @@ The setup script installs Git, Node.js, Homebrew, and fzf if missing, then launc
 brew update && brew upgrade awesome-lazy-zsh
 
 # Via Git
-cd awesome-lazy-zsh && git pull && npm install
+cd awesome-lazy-zsh && git pull --ff-only && npm ci --ignore-scripts
 ```
 
 ## Installation Options

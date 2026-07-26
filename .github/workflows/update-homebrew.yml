@@ -62,9 +62,13 @@ jobs:
           echo "Updated formula to ${TAG} with SHA256: ${SHA256}"
           cat awesome-lazy-zsh.rb
 
-      - name: Commit and push
+      - name: Validate formula syntax
+        run: ruby -c homebrew-tap/Formula/awesome-lazy-zsh.rb
+
+      - name: Commit, push automation branch, and open PR
         env:
           TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
           set -euo pipefail
           
@@ -80,4 +84,9 @@ jobs:
           fi
           
           git commit -m "chore: bump formula to ${TAG}"
-          git push
+          branch="automation/formula-${TAG}"
+          git push --force-with-lease origin "HEAD:refs/heads/${branch}"
+          gh pr create --repo AmJaradat01/homebrew-awesome-lazy-zsh --base main --head "$branch" \
+            --title "chore: bump formula to ${TAG}" \
+            --body "Updates the formula to the signed ${TAG} release. Merge only after tap CI and formula tests pass." \
+            || gh pr view "$branch" --repo AmJaradat01/homebrew-awesome-lazy-zsh

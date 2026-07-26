@@ -8,8 +8,10 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import { updateZshrc } from './zshrcManager.js';
+import { installPlugin } from './pluginManager.js';
+import { installCustomPlugin, loadCustomPlugins } from './customPlugins.js';
 
-const PROFILES_DIR = path.join(os.homedir(), '.awesome-lazy-zsh/profiles');
+const PROFILES_DIR = path.join(process.env.AWESOME_LAZY_ZSH_DATA_HOME || os.homedir(), '.awesome-lazy-zsh/profiles');
 
 /**
  * Ensures profiles directory exists
@@ -89,6 +91,16 @@ export async function switchProfile(name) {
     if (!profile) return false;
     
     console.log(chalk.blue(`🔄 Switching to profile '${name}'...`));
+    for (const plugin of profile.plugins || []) {
+        const customUrl = profile.customRepos?.[plugin];
+        const installed = customUrl
+            ? await installCustomPlugin(plugin, customUrl)
+            : await installPlugin(plugin);
+        if (!installed) {
+            console.error(chalk.red(`❌ Could not install profile component '${plugin}'`));
+            return false;
+        }
+    }
     await updateZshrc(profile.plugins, profile.theme);
     console.log(chalk.green(`✅ Switched to profile '${name}'`));
     return true;

@@ -72,5 +72,5 @@ export const themeRepos = {
     'powerlevel10k': 'https://github.com/romkatv/powerlevel10k.git#v1.20.0',
     'agnoster': '',
     'spaceship': 'https://github.com/spaceship-prompt/spaceship-prompt.git#v4.22.5',
-    'starship': 'https://github.com/starship/starship.git#v1.21.1'
+    'starship': 'binary'
 };

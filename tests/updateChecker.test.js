@@ -198,12 +198,14 @@ describe('checkForUpdate', () => {
 });
 
 describe('performUpdate - git method', () => {
+    const successRunner = async () => ({ success: true, output: 'ok' });
+
     it('returns object with success and message for git method', async () => {
         const { performUpdate } = await import(`../src/utils/updateChecker.js?t=${Date.now()}_gitpull`);
 
         // performUpdate runs git pull on the project root (which is a git repo).
         // Verify it returns the expected shape.
-        const result = await performUpdate('git');
+        const result = await performUpdate('git', '3.4.5', successRunner);
         assert.equal(typeof result.success, 'boolean');
         assert.equal(typeof result.message, 'string');
     });
@@ -216,7 +218,7 @@ describe('performUpdate - git method', () => {
 
         try {
             const { performUpdate } = await import(`../src/utils/updateChecker.js?t=${Date.now()}_gitfail`);
-            const result = await performUpdate('git');
+            const result = await performUpdate('git', '3.4.5', async () => ({ success: false, output: 'simulated failure' }));
             assert.equal(result.success, false);
             assert.equal(typeof result.message, 'string');
         } finally {
@@ -233,7 +235,7 @@ describe('performUpdate - git method', () => {
         const { performUpdate } = await import(`../src/utils/updateChecker.js?t=${Date.now()}_noreject`);
 
         // performUpdate should NEVER reject — it catches all errors
-        const result = await performUpdate('brew');
+        const result = await performUpdate('brew', '3.4.5', successRunner);
         assert.equal(typeof result.success, 'boolean');
         assert.equal(typeof result.message, 'string');
     });

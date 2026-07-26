@@ -9,7 +9,8 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 
-const CUSTOM_PLUGINS_FILE = path.join(os.homedir(), '.awesome-lazy-zsh/custom-plugins.json');
+const userHome = process.env.AWESOME_LAZY_ZSH_DATA_HOME || os.homedir();
+const CUSTOM_PLUGINS_FILE = path.join(userHome, '.awesome-lazy-zsh/custom-plugins.json');
 
 /**
  * Validates a plugin name to prevent path traversal and shell metacharacters.
@@ -156,10 +157,10 @@ export async function installCustomPlugin(name, repoUrl) {
         return false;
     }
 
-    const pluginPath = path.join(os.homedir(), '.oh-my-zsh/custom/plugins', name);
+    const pluginPath = path.join(userHome, '.oh-my-zsh/custom/plugins', name);
     
     // Double-check the resolved path is still under the plugins directory (belt-and-suspenders)
-    const pluginsBase = path.join(os.homedir(), '.oh-my-zsh/custom/plugins');
+    const pluginsBase = path.join(userHome, '.oh-my-zsh/custom/plugins');
     const resolvedPath = path.resolve(pluginPath);
     if (!resolvedPath.startsWith(pluginsBase + path.sep) && resolvedPath !== pluginsBase) {
         console.error(chalk.red(`❌ Invalid plugin path: resolved path escapes plugins directory.`));

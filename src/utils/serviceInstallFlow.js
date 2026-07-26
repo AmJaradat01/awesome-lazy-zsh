@@ -97,7 +97,7 @@ export function generateSummary(results) {
  * @param {string[]} selectedPlugins - List of selected plugin names
  * @returns {Promise<void>}
  */
-export async function runServiceInstallation(selectedPlugins) {
+export async function runServiceInstallation(selectedPlugins, resumeState = null) {
     const installableServices = getInstallableServices(selectedPlugins);
 
     // If no installable services found, return early (no prompt)
@@ -106,7 +106,7 @@ export async function runServiceInstallation(selectedPlugins) {
     }
 
     // Prompt user: "Install selected services" vs "Skip (aliases only)"
-    const actionResponse = await prompts({
+    const actionResponse = resumeState ? { action: 'install' } : await prompts({
         type: 'select',
         name: 'action',
         message: 'Service-related plugins detected. Would you like to install the actual service servers?',
@@ -126,7 +126,7 @@ export async function runServiceInstallation(selectedPlugins) {
     }
 
     // Show multi-select of installable services (all pre-selected by default)
-    const servicesResponse = await prompts({
+    const servicesResponse = resumeState ? { selectedServices: resumeState.pendingServices || [] } : await prompts({
         type: 'multiselect',
         name: 'selectedServices',
         message: 'Select services to install:',
@@ -162,7 +162,7 @@ export async function runServiceInstallation(selectedPlugins) {
 
     // Install each selected service
     const results = [];
-    const installedServices = [];
+    const installedServices = [...(resumeState?.installedServices || [])];
     const pendingServices = [...selectedServices];
 
     for (const serviceKey of selectedServices) {

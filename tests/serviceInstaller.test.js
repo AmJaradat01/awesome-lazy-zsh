@@ -136,7 +136,7 @@ describe('Feature: service-installation, Property 3: Start command generation co
      *
      * For any service key in the service registry and for any valid platform,
      * the generated start command SHALL be `brew services start <brew.package>` on macOS,
-     * or `sudo systemctl start <systemdUnit>` followed by `sudo systemctl enable <systemdUnit>` on Linux.
+     * or `sudo systemctl start <systemdUnit>` on Linux without enabling it at boot.
      */
     it('generates correct start commands for every service × platform combination', () => {
         fc.assert(
@@ -168,11 +168,8 @@ describe('Feature: service-installation, Property 3: Start command generation co
                     if (platform.os === 'linux') {
                         assert.deepEqual(
                             commands,
-                            [
-                                `sudo systemctl start ${service.systemdUnit}`,
-                                `sudo systemctl enable ${service.systemdUnit}`
-                            ],
-                            `Linux start commands must be systemctl start + enable for '${service.systemdUnit}'`
+                            [`sudo systemctl start ${service.systemdUnit}`],
+                            `Linux start command must not enable '${service.systemdUnit}' at boot`
                         );
                     }
                 }

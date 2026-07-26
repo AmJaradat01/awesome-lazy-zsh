@@ -37,11 +37,11 @@ export const serviceRegistry = {
         },
         apt: {
             packages: ['mongodb-org'],
-            repoSetup: 'wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add - && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list && sudo apt-get update'
+            repoSetup: 'set -e; . /etc/os-release; arch=$(dpkg --print-architecture); curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor --yes -o /usr/share/keyrings/mongodb-server-7.0.gpg; echo "deb [arch=$arch signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg] https://repo.mongodb.org/apt/ubuntu ${VERSION_CODENAME}/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list >/dev/null; sudo apt-get update'
         },
         yum: {
             packages: ['mongodb-org'],
-            repoSetup: 'cat <<EOF | sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo\n[mongodb-org-7.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/\\$releasever/mongodb-org/7.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc\nEOF'
+            repoSetup: 'printf "%s\\n" "[mongodb-org-7.0]" "name=MongoDB Repository" "baseurl=https://repo.mongodb.org/yum/redhat/\\$releasever/mongodb-org/7.0/\\$basearch/" "gpgcheck=1" "enabled=1" "gpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo >/dev/null'
         },
         systemdUnit: 'mongod'
     },
@@ -127,7 +127,7 @@ export const serviceRegistry = {
         },
         apt: {
             packages: ['elasticsearch'],
-            repoSetup: 'wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list && sudo apt-get update'
+            repoSetup: 'curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor --yes -o /usr/share/keyrings/elasticsearch-keyring.gpg && echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list >/dev/null && sudo apt-get update'
         },
         yum: {
             packages: ['elasticsearch'],

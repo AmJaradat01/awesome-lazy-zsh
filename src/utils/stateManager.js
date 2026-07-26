@@ -23,7 +23,8 @@ import chalk from 'chalk';
  */
 
 /** Path to the state file in user's home directory */
-export const STATE_FILE_PATH = path.join(os.homedir(), '.awesome-lazy-zsh-state.json');
+const dataHome = process.env.AWESOME_LAZY_ZSH_DATA_HOME || os.homedir();
+export const STATE_FILE_PATH = path.join(dataHome, '.awesome-lazy-zsh-state.json');
 
 /** Current schema version for state file validation */
 export const CURRENT_SCHEMA_VERSION = 1;
@@ -59,6 +60,7 @@ export function readState() {
  */
 export function writeState(partialState) {
     try {
+        fs.mkdirSync(path.dirname(STATE_FILE_PATH), { recursive: true, mode: 0o700 });
         const existing = readState() || {};
         const merged = {
             ...existing,

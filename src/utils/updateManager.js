@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
+import { loadCustomPlugins } from './customPlugins.js';
 
 const PLUGINS_DIR = path.join(os.homedir(), '.oh-my-zsh/custom/plugins');
 
@@ -29,7 +30,18 @@ export async function updatePlugin(pluginName) {
     }
 
     console.log(chalk.yellow(`🔄 Updating ${pluginName}...`));
-    const success = await runCommandSafe('git', ['pull'], { cwd: pluginPath });
+    const configured = pluginRepos[pluginName];
+    const custom = loadCustomPlugins()[pluginName];
+    let success;
+    if (configured && configured !== 'alias-only') {
+        const ref = configured.includes('#') ? configured.slice(configured.indexOf('#') + 1) : 'HEAD';
+        success = await runCommandSafe('git', ['fetch', '--tags', '--prune', 'origin'], { cwd: pluginPath });
+        if (success) success = await runCommandSafe('git', ['checkout', '--detach', ref], { cwd: pluginPath });
+    } else if (custom) {
+        success = await runCommandSafe('git', ['pull', '--ff-only'], { cwd: pluginPath });
+    } else {
+        return false;
+    }
     
     if (success) {
         console.log(chalk.green(`✅ ${pluginName} updated`));
@@ -74,5 +86,7 @@ export async function rollbackPlugin(pluginName) {
     if (!fs.existsSync(pluginPath)) return false;
     
     console.log(chalk.yellow(`⏪ Rolling back ${pluginName}...`));
-    return await runCommandSafe('git', ['reset', '--hard', 'HEAD~1'], { cwd: pluginPath });
+    const success = await runCommandSafe('git', ['reflog', 'exists'], { cwd: pluginPath });
+    if (!success) return false;
+    return await runCommandSafe('git', ['reset', '--hard', 'HEAD@{1}'], { cwd: pluginPath });
 }
