@@ -1,5 +1,14 @@
 # Awesome Lazy Zsh
 
+```
+     _                                               _                         _____    _     
+    / \__      _____  ___  ___  _ __ ___   ___      | |    __ _ _____   _     |__  /___| |__  
+   / _ \ \ /\ / / _ \/ __|/ _ \| '_ ` _ \ / _ \_____| |   / _` |_  / | | |_____ / // __| '_ \ 
+  / ___ \ V  V /  __/\__ \ (_) | | | | | |  __/_____| |__| (_| |/ /| |_| |_____/ /_\__ \ | | |
+ /_/   \_\_/\_/ \___||___/\___/|_| |_| |_|\___|     |_____\__,_/___|\__, |    /____|___/_| |_|
+                                                                    |___/                     
+```
+
 ![Version](https://img.shields.io/badge/version-v3.5.0-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
 
 **The easiest way to set up and manage your Zsh environment**
