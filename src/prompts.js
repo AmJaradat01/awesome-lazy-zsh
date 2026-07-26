@@ -76,6 +76,8 @@ export async function promptInitialAction() {
             choices: [
                 { title: 'Start fresh installation', value: 'freshInstallation' },
                 { title: 'Default installation', value: 'defaultInstallation' },
+                { title: 'Update existing configuration', value: 'updateConfig' },
+                { title: 'Analyze & repair .zshrc', value: 'analyzeRepair' },
                 { title: 'Restore/Backup', value: 'restoreBackup' },
                 { title: 'Update plugins', value: 'updatePlugins' },
                 { title: 'Manage profiles', value: 'manageProfiles' },
@@ -90,6 +92,58 @@ export async function promptInitialAction() {
         return startOption;
     } catch (error) {
         console.error('Error during initial action selection:', error);
+        return null;
+    }
+}
+
+/**
+ * Prompts user for configuration update action
+ * @returns {Promise<string|null>} Selected action type
+ */
+export async function promptUpdateConfig() {
+    try {
+        const action = await getUserSelection({
+            type: 'select',
+            name: 'action',
+            message: 'What would you like to update?',
+            choices: [
+                { title: 'Add a plugin', value: 'addPlugin' },
+                { title: 'Remove a plugin', value: 'removePlugin' },
+                { title: 'Change theme', value: 'changeTheme' },
+                { title: 'Clean duplicates', value: 'cleanDuplicates' },
+                { title: 'Preview changes', value: 'preview' },
+                { title: 'Back to main menu', value: 'back' }
+            ]
+        });
+
+        return action;
+    } catch (error) {
+        console.error('Error during update config selection:', error);
+        return null;
+    }
+}
+
+/**
+ * Prompts user for analyze/repair action
+ * @returns {Promise<string|null>} Selected action type
+ */
+export async function promptAnalyzeRepair() {
+    try {
+        const action = await getUserSelection({
+            type: 'select',
+            name: 'action',
+            message: 'Analyze & Repair options:',
+            choices: [
+                { title: 'Show analysis report', value: 'analyze' },
+                { title: 'Preview repairs', value: 'previewRepair' },
+                { title: 'Apply repairs', value: 'repair' },
+                { title: 'Back to main menu', value: 'back' }
+            ]
+        });
+
+        return action;
+    } catch (error) {
+        console.error('Error during analyze/repair selection:', error);
         return null;
     }
 }
