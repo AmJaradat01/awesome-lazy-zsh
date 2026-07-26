@@ -4,7 +4,7 @@
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-import { promptInitialAction, getUserSelection, promptResume, promptUpdate } from './prompts.js';
+import { promptInitialAction, getUserSelection, promptResume, promptUpdate, promptUpdateConfig, promptAnalyzeRepair } from './prompts.js';
 import { handleRestoreBackup } from './utils/backupRestore.js';
 import { runFreshInstallation, runDefaultInstallation } from './utils/pluginManager.js';
 import { chooseTheme, applyDefaultTheme } from './utils/themeManager.js';
@@ -13,7 +13,18 @@ import { updateAllPlugins } from './utils/updateManager.js';
 import { saveProfile, listProfiles, switchProfile } from './utils/profileManager.js';
 import { installCustomPlugin, loadCustomPlugins } from './utils/customPlugins.js';
 import { readState, writeState, deleteState, validateState, isExpired } from './utils/stateManager.js';
-import { updateZshrc, extractExistingPlugins } from './utils/zshrcManager.js';
+import { 
+    updateZshrc, 
+    extractExistingPlugins, 
+    extractExistingTheme,
+    addPlugin, 
+    removePlugin, 
+    setTheme, 
+    analyzeZshrc, 
+    repairZshrc, 
+    cleanDuplicates,
+    parseZshrcFile
+} from './utils/zshrcManager.js';
 import { pluginRepos } from './utils/config.js';
 import { runServiceInstallation } from './utils/serviceInstallFlow.js';
 import { checkForUpdate, performUpdate, writeCache, readCache } from './utils/updateChecker.js';
@@ -419,6 +430,91 @@ async function main() {
             return;
         }
 
+        // CLI flags for non-interactive updates
+        const addPluginIdx = process.argv.indexOf('--add-plugin');
+        if (addPluginIdx !== -1 && process.argv[addPluginIdx + 1]) {
+            const pluginName = process.argv[addPluginIdx + 1];
+            const result = await addPlugin(pluginName);
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+            return;
+        }
+
+        const removePluginIdx = process.argv.indexOf('--remove-plugin');
+        if (removePluginIdx !== -1 && process.argv[removePluginIdx + 1]) {
+            const pluginName = process.argv[removePluginIdx + 1];
+            const result = await removePlugin(pluginName);
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+            return;
+        }
+
+        const setThemeIdx = process.argv.indexOf('--set-theme');
+        if (setThemeIdx !== -1 && process.argv[setThemeIdx + 1]) {
+            const themeName = process.argv[setThemeIdx + 1];
+            const result = await setTheme(themeName);
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+            return;
+        }
+
+        if (process.argv.includes('--analyze')) {
+            const result = await analyzeZshrc();
+            if (!result) {
+                console.log(chalk.yellow('No .zshrc file found.'));
+                return;
+            }
+            console.log(result.report);
+            return;
+        }
+
+        if (process.argv.includes('--repair')) {
+            const result = await repairZshrc({ preview: false });
+            if (result.repairs.length === 0) {
+                console.log(chalk.green('No repairs needed.'));
+            } else {
+                console.log(chalk.green(`Applied ${result.repairs.length} repair(s):`));
+                for (const repair of result.repairs) {
+                    console.log(`  - ${repair}`);
+                }
+            }
+            return;
+        }
+
+        if (process.argv.includes('--clean-duplicates')) {
+            const result = await cleanDuplicates();
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+            return;
+        }
+
+        if (process.argv.includes('--help')) {
+            console.log(`
+${chalk.bold('awesome-lazy-zsh')} - Streamlined Zsh setup tool
+
+${chalk.bold('USAGE:')}
+  awesome-lazy-zsh [OPTIONS]
+
+${chalk.bold('OPTIONS:')}
+  --version              Show version number
+  --help                 Show this help message
+  --doctor               Check system dependencies
+
+${chalk.bold('CONFIGURATION:')}
+  --add-plugin <name>    Add a plugin to .zshrc
+  --remove-plugin <name> Remove a plugin from .zshrc  
+  --set-theme <name>     Change the Zsh theme
+
+${chalk.bold('MAINTENANCE:')}
+  --analyze              Analyze .zshrc for issues
+  --repair               Auto-repair .zshrc syntax errors
+  --clean-duplicates     Remove duplicate entries from .zshrc
+
+${chalk.bold('EXAMPLES:')}
+  awesome-lazy-zsh --add-plugin zsh-autosuggestions
+  awesome-lazy-zsh --set-theme powerlevel10k
+  awesome-lazy-zsh --analyze
+  awesome-lazy-zsh --repair
+`);
+            return;
+        }
+
         separator();
 
         // Update check
@@ -518,11 +614,144 @@ async function main() {
             await handleProfileManagement();
         } else if (startOption === 'addCustomPlugin') {
             await handleCustomPlugin();
+        } else if (startOption === 'updateConfig') {
+            await handleUpdateConfig();
+        } else if (startOption === 'analyzeRepair') {
+            await handleAnalyzeRepair();
         } else {
             console.error('❌ Unknown option selected. Exiting.');
         }
     } catch (error) {
         console.error('❌ An error occurred during the setup process:', error);
+    }
+}
+
+/**
+ * Handles the Update Configuration menu
+ */
+async function handleUpdateConfig() {
+    const action = await promptUpdateConfig();
+
+    if (!action || action === 'back') return;
+
+    if (action === 'addPlugin') {
+        // Get list of available plugins not currently installed
+        const parsed = parseZshrcFile();
+        const currentPlugins = parsed?.settings.allPlugins || parsed?.settings.plugins || [];
+        const availablePlugins = Object.keys(pluginRepos).filter(p => !currentPlugins.includes(p));
+
+        if (availablePlugins.length === 0) {
+            console.log(chalk.yellow('All available plugins are already installed.'));
+            return;
+        }
+
+        const { plugin } = await prompts({
+            type: 'autocomplete',
+            name: 'plugin',
+            message: 'Select plugin to add:',
+            choices: availablePlugins.map(p => ({ title: p, value: p })),
+            suggest: (input, choices) => 
+                choices.filter(c => c.title.toLowerCase().includes(input.toLowerCase()))
+        });
+
+        if (plugin) {
+            const result = await addPlugin(plugin);
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+        }
+    } else if (action === 'removePlugin') {
+        const parsed = parseZshrcFile();
+        const currentPlugins = parsed?.settings.allPlugins || parsed?.settings.plugins || [];
+
+        if (currentPlugins.length === 0) {
+            console.log(chalk.yellow('No plugins installed.'));
+            return;
+        }
+
+        const { plugin } = await prompts({
+            type: 'select',
+            name: 'plugin',
+            message: 'Select plugin to remove:',
+            choices: currentPlugins.map(p => ({ title: p, value: p }))
+        });
+
+        if (plugin) {
+            const result = await removePlugin(plugin);
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+        }
+    } else if (action === 'changeTheme') {
+        const themes = Object.keys(await import('./utils/config.js').then(m => m.themeRepos));
+        
+        const { theme } = await prompts({
+            type: 'select',
+            name: 'theme',
+            message: 'Select theme:',
+            choices: themes.map(t => ({ title: t, value: t }))
+        });
+
+        if (theme) {
+            const result = await setTheme(theme);
+            console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+        }
+    } else if (action === 'cleanDuplicates') {
+        console.log(chalk.blue('🔍 Checking for duplicates...'));
+        const result = await cleanDuplicates();
+        console.log(result.success ? chalk.green(`✅ ${result.message}`) : chalk.red(`❌ ${result.message}`));
+    } else if (action === 'preview') {
+        const parsed = parseZshrcFile();
+        if (!parsed) {
+            console.log(chalk.yellow('No .zshrc file found.'));
+            return;
+        }
+        
+        const plugins = parsed.settings.allPlugins.length > 0 ? parsed.settings.allPlugins : parsed.settings.plugins;
+        const theme = parsed.settings.theme?.value || 'robbyrussell';
+        
+        const result = await updateZshrc(plugins, theme, { preview: true });
+        if (result.preview) {
+            console.log(result.preview);
+        }
+    }
+}
+
+/**
+ * Handles the Analyze & Repair menu
+ */
+async function handleAnalyzeRepair() {
+    const action = await promptAnalyzeRepair();
+
+    if (!action || action === 'back') return;
+
+    if (action === 'analyze') {
+        const result = await analyzeZshrc();
+        if (!result) {
+            console.log(chalk.yellow('No .zshrc file found.'));
+            return;
+        }
+        console.log(chalk.bold('\n📊 .zshrc Analysis Report\n'));
+        console.log(result.report);
+    } else if (action === 'previewRepair') {
+        const result = await repairZshrc({ preview: true });
+        if (result.repairs.length === 0) {
+            console.log(chalk.green('✅ No repairs needed - your .zshrc looks healthy!'));
+        } else {
+            console.log(chalk.yellow(`Found ${result.repairs.length} issue(s) to fix:\n`));
+            for (const repair of result.repairs) {
+                console.log(chalk.blue(`  • ${repair}`));
+            }
+            if (result.preview) {
+                console.log('\n' + result.preview);
+            }
+        }
+    } else if (action === 'repair') {
+        const result = await repairZshrc({ preview: false });
+        if (result.repairs.length === 0) {
+            console.log(chalk.green('✅ No repairs needed - your .zshrc looks healthy!'));
+        } else {
+            console.log(chalk.green(`✅ Applied ${result.repairs.length} repair(s):`));
+            for (const repair of result.repairs) {
+                console.log(chalk.blue(`  • ${repair}`));
+            }
+        }
     }
 }
 

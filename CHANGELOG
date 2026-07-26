@@ -2,6 +2,70 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.0] - 2026-07-26
+
+### Added
+- **Intelligent .zshrc Parser** (`zshrcParser.js`) - Complete rewrite of .zshrc handling
+  - Section detection: user-pre, managed-block, user-post, third-party integrations
+  - Duplicate detection for exports, aliases, functions, PATH entries, plugins, themes
+  - Syntax validation: detects orphaned `fi`/`done`/`esac`, unclosed blocks, malformed PATH
+  - Third-party integration preservation: Kiro CLI, iTerm2, NVM, Homebrew blocks
+  - Settings extraction: theme, plugins (including alias-only from metadata), exports, aliases
+
+- **Smart .zshrc Updates** - Intelligent merging instead of appending
+  - Preserves user customizations outside the managed block
+  - Automatically cleans duplicates when updating
+  - Diff preview mode to see changes before applying
+  - Auto-repair of common syntax errors
+
+- **Incremental Configuration Updates**
+  - `addPlugin(name)` - Add a single plugin
+  - `removePlugin(name)` - Remove a single plugin  
+  - `setTheme(name)` - Change theme
+  - `cleanDuplicates()` - Remove duplicate entries
+  - `repairZshrc()` - Fix syntax errors
+
+- **New CLI Flags** for non-interactive updates
+  - `--add-plugin <name>` - Add a plugin
+  - `--remove-plugin <name>` - Remove a plugin
+  - `--set-theme <name>` - Change theme
+  - `--analyze` - Show .zshrc analysis report
+  - `--repair` - Auto-fix syntax errors
+  - `--clean-duplicates` - Remove duplicates
+  - `--help` - Show help with all options
+
+- **New Menu Options**
+  - "Update existing configuration" - Add/remove plugins, change theme, clean duplicates
+  - "Analyze & repair .zshrc" - View analysis report, preview/apply repairs
+
+- **Enhanced Profile Management**
+  - `saveCurrentAsProfile(name)` - Save current config as profile
+  - `deleteProfile(name)` - Delete a profile
+  - `getProfileInfo(name)` - Get profile details
+  - `importProfile(path, name)` - Import profile from file
+  - `exportProfile(name, path)` - Export profile to file
+  - `compareProfiles(name1, name2)` - Compare two profiles
+
+- **Comprehensive Tests** - 34 new tests for parser and manager
+
+### Changed
+- Profile format version bumped to v2 with additional metadata
+- Backups now include repair operations
+- User content cleaning is more aggressive about removing managed items
+
+### Fixed
+- **Duplicate entries** - No more duplicate plugins, aliases, PATH entries, exports
+- **Syntax errors** - Orphaned `fi` statements, malformed PATH assignments
+- **Content corruption** - Error messages no longer embedded in exports
+- **Third-party integrations** - Kiro CLI blocks properly preserved at top/bottom
+
+### Migration Notes
+If upgrading from v3.4.x:
+1. Run `awesome-lazy-zsh --analyze` to see current .zshrc status
+2. Run `awesome-lazy-zsh --repair` to fix any syntax errors
+3. The next plugin/theme change will automatically clean duplicates
+4. Your user customizations outside the managed block are preserved
+
 ## [3.4.5] - 2026-07-26
 
 ### Security
