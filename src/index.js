@@ -422,7 +422,12 @@ async function main() {
             ];
             let healthy = true;
             for (const [name, command] of checks) {
-                const available = command.includes('/') ? fs.existsSync(command) : await runCommandSafe('sh', ['-c', `command -v ${command}`]);
+                // For absolute paths (e.g. process.execPath), check existence directly.
+                // For bare names, probe with --version to avoid constructing a shell string
+                // from environment values (guards against shell injection via execPath).
+                const available = command.includes('/')
+                    ? fs.existsSync(command)
+                    : await runCommandSafe(command, ['--version'], { stdio: 'ignore' });
                 console.log(`${available ? 'OK' : 'MISSING'} ${name}`);
                 healthy &&= Boolean(available);
             }
