@@ -41,21 +41,29 @@ export function runCommand(command) {
  */
 export function runCommandSafe(binary, args, options = {}) {
     return new Promise((resolve) => {
+        const stdio = options.stdio || 'inherit';
+        const silent = stdio === 'ignore' || stdio === 'pipe';
         try {
-            const displayCmd = `${binary} ${args.join(' ')}`;
-            console.log(chalk.blue(`🚀 Running: ${displayCmd}`));
+            if (!silent) {
+                const displayCmd = `${binary} ${args.join(' ')}`;
+                console.log(chalk.blue(`🚀 Running: ${displayCmd}`));
+            }
             execFileSync(binary, args, {
-                stdio: 'inherit',
+                stdio,
                 timeout: options.timeout || 60000,
                 cwd: options.cwd || undefined,
                 env: options.env || process.env
             });
-            console.log(chalk.green(`✅ Command executed successfully`));
+            if (!silent) {
+                console.log(chalk.green(`✅ Command executed successfully`));
+            }
             resolve(true);
         } catch (error) {
-            const displayCmd = `${binary} ${args.join(' ')}`;
-            console.error(chalk.red(`❌ Command failed: ${displayCmd}`));
-            console.error(chalk.red(`Error: ${error.message}`));
+            if (!silent) {
+                const displayCmd = `${binary} ${args.join(' ')}`;
+                console.error(chalk.red(`❌ Command failed: ${displayCmd}`));
+                console.error(chalk.red(`Error: ${error.message}`));
+            }
             resolve(false);
         }
     });
