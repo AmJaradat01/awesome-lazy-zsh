@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        node-version: ['18', '20', '22']
+        node-version: ['20', '22', '24']
 
     steps:
       # Pinned to full SHA for supply-chain security (v4.4.0)
@@ -40,25 +40,10 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        # Retry up to 3 times due to intermittent Node.js test runner deserialization issues
-        run: |
-          for i in 1 2 3; do
-            echo "Test attempt $i..."
-            if npm test; then
-              echo "Tests passed on attempt $i"
-              exit 0
-            fi
-            if [ $i -lt 3 ]; then
-              echo "Tests failed, retrying..."
-              sleep 2
-            fi
-          done
-          echo "Tests failed after 3 attempts"
-          exit 1
-        env:
-          # Use isolated test directory to avoid writing to real home
-          HOME: ${{ runner.temp }}/test-home
-          AWESOME_LAZY_ZSH_TEST_MODE: "1"
+        run: npm test
+
+      - name: Run integration tests
+        run: npm run test:integration
 
   lint:
     name: Lint
@@ -84,11 +69,11 @@ jobs:
       - name: Check shell scripts
         run: |
           # Install shellcheck
-          sudo apt-get update && sudo apt-get install -y shellcheck
+          sudo apt-get update && sudo apt-get install -y shellcheck zsh
           
           # Lint shell scripts
-          shellcheck setup.sh || true
-          shellcheck src/*.zsh || true
+          shellcheck setup.sh
+          find src -name '*.zsh' -print0 | xargs -0 -n1 zsh -n
 
   security:
     name: Security Audit

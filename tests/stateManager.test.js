@@ -41,8 +41,8 @@ function createValidState(overrides = {}) {
 }
 
 describe('stateManager constants', () => {
-    it('STATE_FILE_PATH points to home directory', () => {
-        const expected = path.join(os.homedir(), '.awesome-lazy-zsh-state.json');
+    it('STATE_FILE_PATH points to the isolated application data directory', () => {
+        const expected = path.join(process.env.AWESOME_LAZY_ZSH_DATA_HOME || os.homedir(), '.awesome-lazy-zsh-state.json');
         assert.equal(STATE_FILE_PATH, expected);
     });
 

@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Require a GitHub-verified annotated tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          ref_json="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}")"
+          test "$(jq -r '.object.type' <<<"$ref_json")" = tag
+          tag_sha="$(jq -r '.object.sha' <<<"$ref_json")"
+          test "$(gh api "repos/${GITHUB_REPOSITORY}/git/tags/${tag_sha}" --jq '.verification.verified')" = true
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm audit --audit-level=high
+      - name: Build release assets
+        run: |
+          npm pack --ignore-scripts
+          npm sbom --sbom-format cyclonedx > "awesome-lazy-zsh-${GITHUB_REF_NAME}.cdx.json"
+      - uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661
+        with:
+          subject-path: |
+            awesome-lazy-zsh-*.tgz
+            awesome-lazy-zsh-*.cdx.json
+      - name: Publish immutable release candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mapfile -t assets < <(find . -maxdepth 1 -type f -name 'awesome-lazy-zsh-*' -print)
+          gh release create "${GITHUB_REF_NAME}" "${assets[@]}" --verify-tag --generate-notes --title "${GITHUB_REF_NAME}"

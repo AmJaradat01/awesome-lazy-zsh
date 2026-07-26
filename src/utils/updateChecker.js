@@ -7,11 +7,12 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import chalk from 'chalk';
 
 /** Path to the version cache file in the user's home directory. */
-export const CACHE_FILE_PATH = path.join(os.homedir(), '.awesome-lazy-zsh-update-cache.json');
+const dataHome = process.env.AWESOME_LAZY_ZSH_DATA_HOME || os.homedir();
+export const CACHE_FILE_PATH = path.join(dataHome, '.awesome-lazy-zsh-update-cache.json');
 
 /** Check interval: 24 hours in milliseconds. */
 export const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
@@ -156,6 +157,7 @@ export function readCache() {
  */
 export function writeCache(cache) {
     try {
+        fs.mkdirSync(path.dirname(CACHE_FILE_PATH), { recursive: true, mode: 0o700 });
         const data = {
             latestVersion: cache.latestVersion,
             checkedAt: new Date().toISOString(),
@@ -303,9 +305,9 @@ export function detectInstallMethod() {
  * @param {string} [cwd] - Optional working directory.
  * @returns {Promise<{success: boolean, output: string}>} Result with success status and output.
  */
-function runCommand(command, cwd) {
+function runCommand(command, args, cwd) {
     return new Promise((resolve) => {
-        exec(command, { cwd }, (error, stdout, stderr) => {
+        execFile(command, args, { cwd }, (error, stdout, stderr) => {
             if (error) {
                 resolve({ success: false, output: stderr || error.message });
             } else {
@@ -317,24 +319,28 @@ function runCommand(command, cwd) {
 
 /**
  * Performs the update based on the detected installation method.
- * For 'git': runs `git pull origin master` then `npm install`.
+ * For 'git': verifies and fast-forwards to the exact signed release tag, then runs `npm ci --ignore-scripts`.
  * For 'brew': runs `brew upgrade awesome-lazy-zsh`.
  * Displays progress with chalk styling and handles failures gracefully.
  * Requires explicit user confirmation before executing.
  * @param {'git'|'brew'} installMethod - The installation method.
  * @returns {Promise<{success: boolean, message: string}>} Result of the update operation.
  */
-export async function performUpdate(installMethod) {
+export async function performUpdate(installMethod, latestVersion, commandRunner = runCommand) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const projectRoot = path.resolve(__dirname, '..', '..');
 
     try {
         if (installMethod === 'git') {
-            console.log(chalk.blue('📦 Updating via git pull...'));
+            console.log(chalk.blue('📦 Updating to the signed release tag...'));
 
             // Verify we're pulling from the expected remote
-            const remoteResult = await runCommand('git remote get-url origin', projectRoot);
+            if (!parseVersion(latestVersion)) {
+                return { success: false, message: 'A valid release version is required.' };
+            }
+
+            const remoteResult = await commandRunner('git', ['remote', 'get-url', 'origin'], projectRoot);
             if (remoteResult.success) {
                 const remoteUrl = remoteResult.output.trim();
                 const expectedRepo = 'AmJaradat01/awesome-lazy-zsh';
@@ -345,27 +351,35 @@ export async function performUpdate(installMethod) {
                 }
             }
 
-            const pullResult = await runCommand('git pull origin master', projectRoot);
-            if (!pullResult.success) {
-                console.log(chalk.red(`❌ git pull failed: ${pullResult.output}`));
-                return { success: false, message: pullResult.output };
+            const tag = `v${latestVersion}`;
+            const fetchResult = await commandRunner('git', ['fetch', '--force', 'origin', `refs/tags/${tag}:refs/tags/${tag}`], projectRoot);
+            if (!fetchResult.success) {
+                return { success: false, message: fetchResult.output };
             }
-            console.log(chalk.green('✅ Code updated successfully.'));
+            const verifyResult = await commandRunner('git', ['tag', '-v', tag], projectRoot);
+            if (!verifyResult.success) {
+                return { success: false, message: `Release tag ${tag} does not have a trusted signature: ${verifyResult.output}` };
+            }
+            const mergeResult = await commandRunner('git', ['merge', '--ff-only', tag], projectRoot);
+            if (!mergeResult.success) {
+                return { success: false, message: `Cannot fast-forward to ${tag}: ${mergeResult.output}` };
+            }
+            console.log(chalk.green(`✅ Code updated to signed release ${tag}.`));
 
             console.log(chalk.blue('📦 Installing dependencies...'));
-            const npmResult = await runCommand('npm install --ignore-scripts', projectRoot);
+            const npmResult = await commandRunner('npm', ['ci', '--ignore-scripts'], projectRoot);
             if (!npmResult.success) {
-                console.log(chalk.yellow(`⚠️ npm install failed: ${npmResult.output}`));
+                console.log(chalk.yellow(`⚠️ npm ci failed: ${npmResult.output}`));
                 // Still consider it a success since code was pulled
-                return { success: true, message: 'Code updated, but npm install failed. Please run npm install manually.' };
+                return { success: true, message: 'Code updated, but npm ci failed. Please run npm ci --ignore-scripts manually.' };
             }
             console.log(chalk.green('✅ Dependencies updated.'));
-            return { success: true, message: 'Updated successfully via git pull.' };
+            return { success: true, message: `Updated successfully to signed release ${tag}.` };
 
         } else {
             // brew
             console.log(chalk.blue('📦 Updating via brew upgrade...'));
-            const brewResult = await runCommand('brew upgrade awesome-lazy-zsh');
+            const brewResult = await commandRunner('brew', ['upgrade', 'awesome-lazy-zsh']);
             if (!brewResult.success) {
                 console.log(chalk.red(`❌ brew upgrade failed: ${brewResult.output}`));
                 return { success: false, message: brewResult.output };

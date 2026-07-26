@@ -16,7 +16,8 @@ const BLOCK_START = '# >>> awesome-lazy-zsh managed block >>>';
 const BLOCK_END = '# <<< awesome-lazy-zsh managed block <<<';
 
 // Unified backup directory for all awesome-lazy-zsh backups
-const BACKUP_DIR = path.join(os.homedir(), '.awesome-lazy-zsh', 'backups');
+const userHome = process.env.AWESOME_LAZY_ZSH_DATA_HOME || os.homedir();
+const BACKUP_DIR = path.join(userHome, '.awesome-lazy-zsh', 'backups');
 
 /**
  * Ensures backup directory exists with restrictive permissions
@@ -33,6 +34,13 @@ function ensureBackupDir() {
  * @returns {string[]} Array of plugin names
  */
 export function extractExistingPlugins(zshrcContent) {
+    const metadataMatch = zshrcContent.match(/^# awesome-lazy-zsh-plugins=(\[[^\n]+\])$/m);
+    if (metadataMatch) {
+        try {
+            const plugins = JSON.parse(metadataMatch[1]);
+            if (Array.isArray(plugins) && plugins.every(plugin => typeof plugin === 'string')) return plugins;
+        } catch { /* fall back to the Oh My Zsh plugin array */ }
+    }
     const pluginMatch = zshrcContent.match(/plugins=\(([^)]+)\)/);
     if (pluginMatch && pluginMatch[1]) {
         return pluginMatch[1].split(/\s+/).filter(Boolean);
@@ -126,6 +134,8 @@ ZSH_THEME="${theme}"
 
 # Plugins
 plugins=(${omzPlugins.join(' ')})
+# Complete selection for profiles (includes aliases/custom plugins)
+# awesome-lazy-zsh-plugins=${JSON.stringify(plugins)}
 
 # Load Oh My Zsh
 source \$ZSH/oh-my-zsh.sh
@@ -260,7 +270,7 @@ ${terminalIntegration}`;
 # Awesome-Lazy-Zsh Custom Aliases
 # Using stable opt/ path to survive version upgrades
 `;
-        const aliasDir = path.join(installPath, 'aliases');
+        const aliasDir = path.join(installPath, 'src', 'aliases');
         
         // Always source services.zsh if any service plugin is selected
         const servicePlugins = ['mongodb', 'postgresql', 'mysql', 'redis', 'rabbitmq', 'elasticsearch', 'memcached'];
@@ -278,7 +288,7 @@ ${terminalIntegration}`;
     if (installPath) {
         content += `
 # Awesome-Lazy-Zsh Alias Manager (stable path)
-[ -f "${installPath}/alias-manager.zsh" ] && source "${installPath}/alias-manager.zsh"
+[ -f "${installPath}/src/alias-manager.zsh" ] && source "${installPath}/src/alias-manager.zsh"
 `;
     }
 
@@ -379,9 +389,12 @@ function atomicWrite(filePath, content) {
  * @param {string} theme - Theme name to apply
  */
 export async function updateZshrc(newPlugins, theme) {
-    const zshrcPath = path.join(os.homedir(), '.zshrc');
+    const zshrcPath = path.join(userHome, '.zshrc');
 
     try {
+        if (fs.existsSync(zshrcPath) && fs.lstatSync(zshrcPath).isSymbolicLink()) {
+            throw new Error('Refusing to replace symlinked .zshrc; update the symlink target explicitly.');
+        }
         // Read existing content if file exists
         let existingContent = '';
         if (fs.existsSync(zshrcPath)) {
@@ -394,14 +407,21 @@ export async function updateZshrc(newPlugins, theme) {
         // Extract user content outside our managed block
         const { before, after } = extractUserContent(existingContent);
 
+        // Migrate legacy direct initialization/source lines into the managed block.
+        const cleanBefore = before
+            .split('\n')
+            .filter(line => !/^\s*(?:source|\.)\s+.*oh-my-zsh\.sh\s*$/.test(line))
+            .filter(line => !/alias-manager\.zsh/.test(line))
+            .join('\n');
+
         // Generate our managed block
         const managedBlock = await generateManagedBlockContent(theme, newPlugins);
 
         // Combine: user content before + managed block + user content after
         let finalContent = '';
         
-        if (before.trim()) {
-            finalContent += before.trim() + '\n\n';
+        if (cleanBefore.trim()) {
+            finalContent += cleanBefore.trim() + '\n\n';
         }
         
         finalContent += managedBlock;

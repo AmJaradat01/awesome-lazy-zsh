@@ -186,10 +186,7 @@ export function getStartCommands(serviceKey, platform) {
             return [];
         }
         if (!isValidBinaryName(service.systemdUnit)) return [];
-        return [
-            `sudo systemctl start ${service.systemdUnit}`,
-            `sudo systemctl enable ${service.systemdUnit}`
-        ];
+        return [`sudo systemctl start ${service.systemdUnit}`];
     }
 
     return [];
@@ -270,7 +267,7 @@ export async function installService(serviceKey, platform, execCommand = default
 
 /**
  * Starts a service using platform-appropriate commands.
- * On macOS uses `brew services start`, on Linux uses `systemctl start` + `systemctl enable`.
+ * On macOS uses `brew services start`; on Linux starts the service without enabling it at boot.
  * @param {string} serviceKey - Key from serviceRegistry
  * @param {Object} platform - Detected platform info
  * @param {function} [execCommand] - Optional command executor for testability (returns { success, output })

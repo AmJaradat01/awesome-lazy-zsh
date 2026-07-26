@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.5] - 2026-07-26
+
+### Security
+- Pin and SHA-256 verify the reviewed Oh My Zsh installer; require Homebrew to be installed separately.
+- Require signed exact-release tags for Git self-updates and use `npm ci --ignore-scripts`.
+- Pin all GitHub Actions, add CodeQL/CODEOWNERS, verify tag signatures in the release workflow, and generate SBOM/provenance attestations.
+- Replace the tap's write-capable `pull_request_target` workflow with protected, manually dispatched bottle publication.
+
+### Fixed
+- Use stable Homebrew `opt` paths matching the installed `libexec/src/aliases` layout.
+- Preserve user `.zshrc` content atomically, remove duplicate Oh My Zsh initialization, unify backups, and reject symlink replacement explicitly.
+- Resume pending services and prevent completed plugins from reappearing after another interruption.
+- Install and initialize the Starship binary instead of treating its repository as an Oh My Zsh theme.
+- Preserve alias-only and custom plugins in profiles and install missing profile components.
+- Keep plugin history for deterministic updates/rollback and stop enabling services at boot when users only request a start.
+- Isolate all tests from real user state and remove live Git/npm/Homebrew operations from unit tests.
+
+### Homebrew
+- Install locked npm dependencies during formula installation with lifecycle scripts disabled.
+- Declare `zsh`, `fzf`, and Starship dependencies, execute Node directly at runtime, and functionally test `--version` on every push and PR.
+
 ## [3.4.4] - 2026-07-24
 
 ### Security
