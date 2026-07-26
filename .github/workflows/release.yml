@@ -50,7 +50,7 @@ jobs:
             awesome-lazy-zsh-*.cdx.json
       - name: Publish immutable release candidate
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
           mapfile -t assets < <(find . -maxdepth 1 -type f -name 'awesome-lazy-zsh-*' -print)
           gh release create "${GITHUB_REF_NAME}" "${assets[@]}" --verify-tag --generate-notes --title "${GITHUB_REF_NAME}"
