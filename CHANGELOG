@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.1] - 2026-07-26
+
+### Security
+- **Fix CodeQL `js/shell-command-injection-from-environment` alert** in `--doctor` check
+  - Replace `runCommandSafe('sh', ['-c', \`command -v ${command}\`])` with direct execution
+  - Absolute paths (e.g. `process.execPath`) are now checked via `fs.existsSync()` — no shell involved
+  - Bare command names (`zsh`, `git`) are probed with `runCommandSafe(command, ['--version'], { stdio: 'ignore' })` — `execFileSync` with an argument array, immune to shell metacharacter injection
+- **`runCommandSafe` now respects `options.stdio`**
+  - When `stdio: 'ignore'` or `'pipe'` is passed, suppresses `🚀 Running:` and `✅/❌` console output
+  - Enables silent probing without leaking noise to the user's terminal
+
 ## [3.5.0] - 2026-07-26
 
 ### Added
