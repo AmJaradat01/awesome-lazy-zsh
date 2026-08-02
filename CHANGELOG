@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.6.0] - 2026-08-02
+
+### Added
+- **Mobile Development Plugins** - Four new alias-only plugins for mobile app development:
+  - **Flutter** (70+ aliases) - Core commands, pub dependencies, run/debug, build (APK/IPA/web/desktop), testing, code generation, device management, Dart commands
+  - **React Native** (100+ aliases) - RN CLI, Metro bundler, Android/iOS builds, debugging, Expo, EAS, CocoaPods, Gradle, ADB commands
+  - **Fastlane** (120+ aliases) - Lane execution, Match code signing, Gym builds, Pilot TestFlight, Deliver App Store, Supply Google Play, screenshots, testing
+  - **Firebase** (110+ aliases) - CLI core, Hosting, Cloud Functions, Firestore, Realtime Database, Storage, Authentication, Remote Config, Emulators, App Distribution
+
+### Changed
+- Updated README with new "Mobile Development" section documenting all new plugins
+- Updated serviceRegistry with platform-specific installation commands for all mobile tools
+
 ## [3.5.3] - 2026-08-02
 
 ### Changed

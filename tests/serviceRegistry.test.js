@@ -99,7 +99,8 @@ describe('Feature: service-installation, Property 4: Service registry structural
             'mongodb', 'mysql', 'postgresql', 'redis', 'rabbitmq', 'elasticsearch', 'memcached',
             'aws', 'gcloud', 'azure',
             'kubernetes', 'terraform-extended', 'ansible', 'docker-compose-extended',
-            'python', 'golang', 'rust', 'java'
+            'python', 'golang', 'rust', 'java',
+            'flutter', 'react-native', 'fastlane', 'firebase'
         ];
 
         // All expected services must be covered
