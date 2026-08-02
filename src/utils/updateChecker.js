@@ -384,6 +384,28 @@ export async function performUpdate(installMethod, latestVersion, commandRunner 
                 console.log(chalk.red(`❌ brew upgrade failed: ${brewResult.output}`));
                 return { success: false, message: brewResult.output };
             }
+
+            // Verify the upgrade actually installed the expected version
+            // brew upgrade succeeds even when formula hasn't been updated yet
+            const infoResult = await commandRunner('brew', ['info', '--json=v2', 'awesome-lazy-zsh']);
+            if (infoResult.success) {
+                try {
+                    const info = JSON.parse(infoResult.output);
+                    const installedVersion = info.formulae?.[0]?.installed?.[0]?.version;
+                    if (installedVersion && installedVersion !== latestVersion) {
+                        console.log(chalk.yellow(`⚠️ Homebrew formula not yet updated to v${latestVersion}.`));
+                        console.log(chalk.yellow(`   Currently installed: v${installedVersion}`));
+                        console.log(chalk.yellow(`   The Homebrew formula may take some time to sync with the GitHub release.`));
+                        return { 
+                            success: false, 
+                            message: `Homebrew formula is still at v${installedVersion}. The formula may not be updated yet for v${latestVersion}.` 
+                        };
+                    }
+                } catch {
+                    // JSON parse failed, continue with success
+                }
+            }
+
             console.log(chalk.green('✅ Updated via Homebrew.'));
             return { success: true, message: 'Updated successfully via brew upgrade.' };
         }
