@@ -489,12 +489,46 @@ async function main() {
             return;
         }
 
+        // Handle 'update' subcommand - check and update the tool itself
+        if (process.argv[2] === 'update') {
+            console.log(chalk.blue('🔍 Checking for updates...'));
+            const updateResult = await checkForUpdate();
+            
+            if (!updateResult) {
+                console.log(chalk.yellow('⚠️ Unable to check for updates. Please try again later.'));
+                return;
+            }
+            
+            if (!updateResult.updateAvailable) {
+                console.log(chalk.green(`✅ You are already on the latest version (v${updateResult.currentVersion}).`));
+                return;
+            }
+            
+            const choice = await promptUpdate(updateResult);
+            if (choice === 'yes') {
+                const result = await performUpdate(updateResult.installMethod, updateResult.latestVersion);
+                if (result.success) {
+                    console.log(chalk.green.bold('\n✅ Updated successfully! Please re-run awesome-lazy-zsh.\n'));
+                } else {
+                    console.log(chalk.red(`\n❌ Update failed: ${result.message}\n`));
+                }
+            } else if (choice === 'skip') {
+                const cache = readCache();
+                writeCache({ ...cache, latestVersion: updateResult.latestVersion, skippedVersion: updateResult.latestVersion });
+                console.log(chalk.yellow(`Skipped v${updateResult.latestVersion}. You won't be notified about this version again.`));
+            }
+            return;
+        }
+
         if (process.argv.includes('--help')) {
             console.log(`
 ${chalk.bold('awesome-lazy-zsh')} - Streamlined Zsh setup tool
 
 ${chalk.bold('USAGE:')}
-  awesome-lazy-zsh [OPTIONS]
+  awesome-lazy-zsh [COMMAND] [OPTIONS]
+
+${chalk.bold('COMMANDS:')}
+  update                 Check for and install tool updates
 
 ${chalk.bold('OPTIONS:')}
   --version              Show version number
@@ -512,6 +546,7 @@ ${chalk.bold('MAINTENANCE:')}
   --clean-duplicates     Remove duplicate entries from .zshrc
 
 ${chalk.bold('EXAMPLES:')}
+  awesome-lazy-zsh update
   awesome-lazy-zsh --add-plugin zsh-autosuggestions
   awesome-lazy-zsh --set-theme powerlevel10k
   awesome-lazy-zsh --analyze
@@ -522,27 +557,11 @@ ${chalk.bold('EXAMPLES:')}
 
         separator();
 
-        // Update check
+        // Update notification (non-blocking) - just inform user if update is available
         const updateResult = await checkForUpdate();
         if (updateResult && updateResult.updateAvailable && !updateResult.skipped) {
-            const choice = await promptUpdate(updateResult);
-            if (choice === 'yes') {
-                const result = await performUpdate(updateResult.installMethod, updateResult.latestVersion);
-                if (result.success) {
-                    console.log(chalk.green.bold('\n✅ Updated successfully! Please re-run awesome-lazy-zsh.\n'));
-                    process.exit(0);
-                }
-                // If update failed, continue to normal flow
-                separator();
-            } else if (choice === 'skip') {
-                const cache = readCache();
-                writeCache({ ...cache, latestVersion: updateResult.latestVersion, skippedVersion: updateResult.latestVersion });
-                separator();
-            }
-            // 'no' or null (Ctrl+C): just continue
-            if (choice !== 'yes' && choice !== 'skip') {
-                separator();
-            }
+            console.log(chalk.yellow(`⚡ Update available: v${updateResult.currentVersion} → v${updateResult.latestVersion}`));
+            console.log(chalk.cyan(`   Run 'awesome-lazy-zsh update' to update.\n`));
         }
 
         // Ensure Oh My Zsh is installed

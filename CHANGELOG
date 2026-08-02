@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.3] - 2026-08-02
+
+### Changed
+- **New `update` subcommand** - Tool updates are now explicit via `awesome-lazy-zsh update`
+  - Running `awesome-lazy-zsh` now shows a non-blocking notification if an update is available
+  - Users can run `awesome-lazy-zsh update` to check and install updates
+  - No more automatic update prompts interrupting the main menu flow
+
 ## [3.5.2] - 2026-08-02
 
 ### Fixed
