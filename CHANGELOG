@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.2] - 2026-08-02
+
+### Fixed
+- **Homebrew upgrade verification** - `brew upgrade` now verifies the installed version matches the expected release
+  - Previously, `brew upgrade` would report success even when the Homebrew formula hadn't been updated yet
+  - Now checks `brew info --json=v2` after upgrade to confirm the version actually changed
+  - Displays clear warning when Homebrew formula is out of sync with GitHub release
+
 ## [3.5.1] - 2026-07-26
 
 ### Security
