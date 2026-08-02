@@ -9,7 +9,7 @@
                                                                     |___/                     
 ```
 
-![Version](https://img.shields.io/badge/version-v3.5.0-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
+![Version](https://img.shields.io/badge/version-v3.5.3-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
 
 **The easiest way to set up and manage your Zsh environment**
 
@@ -25,6 +25,11 @@ Awesome-Lazy-Zsh automates your Zsh setup with 42 plugins, 5 themes, configurati
 - **Verified Dependencies** — uses declared Homebrew dependencies and reproducible npm installs
 - **Configuration Profiles** — save, switch, and manage different setups
 - **Custom Plugins** — add plugins from any Git repository
+
+### Update Command (v3.5.3+)
+- **Explicit updates** — run `awesome-lazy-zsh update` to check and install updates
+- Non-blocking notification if update available when running main menu
+- Homebrew upgrade verification — ensures the expected version was actually installed
 
 ### Update Notification (v3.4.0+)
 - **Stay current** — checks for new versions on startup (once per 24 hours)
@@ -89,7 +94,10 @@ The setup script installs Git, Node.js, Homebrew, and fzf if missing, then launc
 
 ### Update
 ```bash
-# Via Homebrew
+# Check for and install updates (recommended)
+awesome-lazy-zsh update
+
+# Or via Homebrew directly
 brew update && brew upgrade awesome-lazy-zsh
 
 # Via Git
