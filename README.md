@@ -154,6 +154,14 @@ If a previous setup was interrupted, you'll also see a **Resume** option to cont
 | `node` | `ni`, `nr`, `yi`, `pi` |
 | `java` | `mci`, `gwb`, `java11`, `java17` |
 
+### Mobile Development
+| Plugin | Aliases |
+|--------|---------|
+| `flutter` | `fl`, `flr`, `flb`, `flpg`, `flpu`, `flt`, `flclean` |
+| `react-native` | `rn`, `rna`, `rni`, `rnstart`, `rnlog`, `expo`, `eas` |
+| `fastlane` | `fll`, `flios`, `fland`, `flmatch`, `flgym`, `flpilot` |
+| `firebase` | `fb`, `fbd`, `fbh`, `fbfn`, `fbfs`, `fbemu`, `fbinit` |
+
 ### Productivity
 | Plugin | Aliases |
 |--------|---------|

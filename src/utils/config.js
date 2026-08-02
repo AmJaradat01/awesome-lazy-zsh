@@ -59,7 +59,13 @@ export const pluginRepos = {
     'git-extras': 'alias-only',
     'ssh': 'alias-only',
     'directories': 'alias-only',
-    'history-search': 'alias-only'
+    'history-search': 'alias-only',
+    
+    // Mobile Development plugins
+    'flutter': 'alias-only',
+    'react-native': 'alias-only',
+    'fastlane': 'alias-only',
+    'firebase': 'alias-only'
 };
 
 /**

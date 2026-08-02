@@ -356,6 +356,80 @@ export const serviceRegistry = {
             repoSetup: null
         },
         systemdUnit: ''
+    },
+
+    // Mobile Development Tools
+    flutter: {
+        displayName: 'Flutter SDK',
+        port: 0,
+        binary: 'flutter',
+        brew: {
+            package: 'flutter',
+            tap: null
+        },
+        apt: {
+            packages: ['snapd'],
+            repoSetup: 'sudo snap install flutter --classic'
+        },
+        yum: {
+            packages: ['snapd'],
+            repoSetup: 'sudo snap install flutter --classic'
+        },
+        systemdUnit: ''
+    },
+    'react-native': {
+        displayName: 'React Native CLI',
+        port: 0,
+        binary: 'react-native',
+        brew: {
+            package: 'watchman',
+            tap: null
+        },
+        apt: {
+            packages: ['watchman'],
+            repoSetup: null
+        },
+        yum: {
+            packages: ['watchman'],
+            repoSetup: null
+        },
+        systemdUnit: ''
+    },
+    fastlane: {
+        displayName: 'Fastlane',
+        port: 0,
+        binary: 'fastlane',
+        brew: {
+            package: 'fastlane',
+            tap: null
+        },
+        apt: {
+            packages: ['ruby-full'],
+            repoSetup: 'sudo gem install fastlane -NV'
+        },
+        yum: {
+            packages: ['ruby', 'ruby-devel'],
+            repoSetup: 'sudo gem install fastlane -NV'
+        },
+        systemdUnit: ''
+    },
+    firebase: {
+        displayName: 'Firebase CLI',
+        port: 0,
+        binary: 'firebase',
+        brew: {
+            package: 'firebase-cli',
+            tap: null
+        },
+        apt: {
+            packages: ['nodejs', 'npm'],
+            repoSetup: 'npm install -g firebase-tools'
+        },
+        yum: {
+            packages: ['nodejs', 'npm'],
+            repoSetup: 'npm install -g firebase-tools'
+        },
+        systemdUnit: ''
     }
 };
 
@@ -386,5 +460,10 @@ export const aliasToService = {
     'python': 'python',
     'golang': 'golang',
     'rust': 'rust',
-    'java': 'java'
+    'java': 'java',
+    // Mobile Development Tools
+    'flutter': 'flutter',
+    'react-native': 'react-native',
+    'fastlane': 'fastlane',
+    'firebase': 'firebase'
 };
