@@ -39,7 +39,7 @@ describe('Feature: service-installation, Property 2: Install command generation 
                     assert.ok(commands.length > 0, `commands must not be empty for known service '${serviceKey}'`);
 
                     if (platform.packageManager === 'brew') {
-                        // If tap is defined, it must be the first command
+                        // If tap is defined, it must include tap, trust, and install commands
                         if (service.brew.tap !== null) {
                             assert.equal(
                                 commands[0],
@@ -48,10 +48,15 @@ describe('Feature: service-installation, Property 2: Install command generation 
                             );
                             assert.equal(
                                 commands[1],
-                                `brew install ${service.brew.package}`,
-                                `Second command must be 'brew install ${service.brew.package}'`
+                                `brew trust --tap ${service.brew.tap}`,
+                                `Second command must be 'brew trust --tap ${service.brew.tap}'`
                             );
-                            assert.equal(commands.length, 2, 'Brew with tap should have exactly 2 commands');
+                            assert.equal(
+                                commands[2],
+                                `brew install ${service.brew.package}`,
+                                `Third command must be 'brew install ${service.brew.package}'`
+                            );
+                            assert.equal(commands.length, 3, 'Brew with tap should have exactly 3 commands');
                         } else {
                             assert.equal(
                                 commands[0],

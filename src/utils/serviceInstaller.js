@@ -118,6 +118,8 @@ export function getInstallCommands(serviceKey, platform) {
         if (service.brew.tap !== null) {
             if (!isValidPackageName(service.brew.tap)) return [];
             commands.push(`brew tap ${service.brew.tap}`);
+            // Trust the tap to allow installation from non-official taps (Homebrew security feature)
+            commands.push(`brew trust --tap ${service.brew.tap}`);
         }
         if (!isValidPackageName(service.brew.package)) return [];
         commands.push(`brew install ${service.brew.package}`);
