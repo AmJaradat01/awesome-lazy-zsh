@@ -18,7 +18,7 @@ Awesome-Lazy-Zsh automates your Zsh setup with 46 plugins, 5 themes, configurati
 ## Features
 
 ### Core
-- **42 Plugins** — databases, cloud CLIs, DevOps tools, languages, and productivity shortcuts
+- **46 Plugins** — databases, cloud CLIs, DevOps tools, languages, mobile development, and productivity shortcuts
 - **5 Themes** — Spaceship, Powerlevel10k, Starship, Agnoster, Robbyrussell
 - **Backup & Restore** — automatic `.zshrc` backups before any changes
 - **Interactive CLI** — guided setup wizard with multi-select menus
@@ -248,7 +248,7 @@ Service installation requires macOS or Linux with a supported package manager. A
 |------|---------|
 | Homebrew | Package manager (macOS/Linux) |
 | Git | Plugin management and cloning |
-| Node.js 18+ | Powers the interactive CLI |
+| Node.js 20+ | Powers the interactive CLI |
 | fzf | Fuzzy finder functionality |
 | Oh My Zsh | Zsh plugin framework |
 
