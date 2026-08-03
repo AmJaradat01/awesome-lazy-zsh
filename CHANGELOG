@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.7.0] - 2026-08-03
+
+### Added
+- **Real-time installation progress** - Service installations now stream output in real-time
+  - Uses `spawn()` instead of `exec()` for package manager commands
+  - Shows actual Homebrew/apt/yum progress as it happens (downloads, extraction, linking)
+  - Color-coded output: dim for progress, yellow for warnings, red for errors
+  - No more silent waiting during long installations
+- **HOMEBREW_NO_AUTO_UPDATE** - Automatic brew updates are suppressed during service installation to speed up the process
+
+### Changed
+- `serviceInstaller.js` refactored to use streaming output via child_process spawn
+
 ## [3.6.2] - 2026-08-03
 
 ### Changed

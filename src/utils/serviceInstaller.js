@@ -1,10 +1,11 @@
 /**
  * Service installer utilities
  * Handles checking, installing, and starting local development services.
+ * Uses spawn() for real-time streaming output during installations.
  * @author Ali M. Jaradat <AmJaradat01@gmail.com>
  */
 
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import chalk from 'chalk';
 import { serviceRegistry } from './serviceRegistry.js';
 
@@ -20,6 +21,11 @@ import { serviceRegistry } from './serviceRegistry.js';
  * @typedef {Object} ExecResult
  * @property {boolean} success - Whether the command executed successfully
  * @property {string} output - Command stdout or error message
+ */
+
+/**
+ * @typedef {Object} SpawnOptions
+ * @property {boolean} [stream=true] - Whether to stream output to console in real-time
  */
 
 /**
@@ -53,17 +59,73 @@ function defaultCheckExecCommand(command) {
 
 /**
  * Default command executor for installService/startService.
- * Wraps child_process exec in a promise, returns { success, output }.
+ * Uses spawn() for real-time streaming output to console.
+ * Shows actual progress from package managers (brew, apt, yum) as it happens.
  * @param {string} command - Shell command to execute
+ * @param {SpawnOptions} [options] - Options for command execution
  * @returns {Promise<ExecResult>}
  */
-function defaultExecCommand(command) {
+function defaultExecCommand(command, options = { stream: true }) {
     return new Promise((resolve) => {
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                resolve({ success: false, output: error.message || stderr || String(error) });
-            } else {
+        // Parse the command for spawn - use shell mode to handle complex commands
+        const child = spawn(command, {
+            shell: true,
+            stdio: options.stream ? ['inherit', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'],
+            env: { ...process.env, HOMEBREW_NO_AUTO_UPDATE: '1' }
+        });
+
+        let stdout = '';
+        let stderr = '';
+
+        if (child.stdout) {
+            child.stdout.on('data', (data) => {
+                const text = data.toString();
+                stdout += text;
+                if (options.stream) {
+                    // Stream output in real-time with indentation for visual hierarchy
+                    const lines = text.split('\n');
+                    for (const line of lines) {
+                        if (line.trim()) {
+                            process.stdout.write(chalk.dim(`      ${line}\n`));
+                        }
+                    }
+                }
+            });
+        }
+
+        if (child.stderr) {
+            child.stderr.on('data', (data) => {
+                const text = data.toString();
+                stderr += text;
+                if (options.stream) {
+                    // Stream stderr in real-time (often contains progress info)
+                    const lines = text.split('\n');
+                    for (const line of lines) {
+                        if (line.trim()) {
+                            // Check if it's an actual error or just progress/warning
+                            if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) {
+                                process.stderr.write(chalk.red(`      ${line}\n`));
+                            } else if (line.toLowerCase().includes('warning')) {
+                                process.stderr.write(chalk.yellow(`      ${line}\n`));
+                            } else {
+                                // Progress info often comes via stderr (e.g., curl, wget progress)
+                                process.stderr.write(chalk.dim(`      ${line}\n`));
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        child.on('error', (error) => {
+            resolve({ success: false, output: error.message });
+        });
+
+        child.on('close', (code) => {
+            if (code === 0) {
                 resolve({ success: true, output: stdout.trim() });
+            } else {
+                resolve({ success: false, output: stderr.trim() || stdout.trim() || `Command exited with code ${code}` });
             }
         });
     });
