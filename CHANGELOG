@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.6.1] - 2026-08-03
+
+### Fixed
+- **Homebrew trust for third-party taps** - Added `brew trust --tap` command before installing from non-official taps
+  - Fixes MongoDB installation failing with "Refusing to load formula from untrusted tap mongodb/brew"
+  - Homebrew now requires explicitly trusting third-party taps before installation
+
 ## [3.6.0] - 2026-08-02
 
 ### Added
