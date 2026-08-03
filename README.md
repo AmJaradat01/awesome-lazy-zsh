@@ -9,11 +9,11 @@
                                                                     |___/                     
 ```
 
-![Version](https://img.shields.io/badge/version-v3.5.3-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
+![Version](https://img.shields.io/badge/version-v3.6.0-blue.svg) [![GitHub Release](https://img.shields.io/github/v/release/AmJaradat01/awesome-lazy-zsh)](https://github.com/AmJaradat01/awesome-lazy-zsh/releases/latest) ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-lightgrey.svg) [![CI](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml/badge.svg)](https://github.com/AmJaradat01/awesome-lazy-zsh/actions/workflows/ci.yml)
 
 **The easiest way to set up and manage your Zsh environment**
 
-Awesome-Lazy-Zsh automates your Zsh setup with 42 plugins, 5 themes, configuration profiles, and service installation. It installs dependencies, manages Oh My Zsh, and gives you a beautiful interactive CLI to build the terminal environment you want.
+Awesome-Lazy-Zsh automates your Zsh setup with 46 plugins, 5 themes, configuration profiles, and service installation. It installs dependencies, manages Oh My Zsh, and gives you a beautiful interactive CLI to build the terminal environment you want.
 
 ## Features
 
