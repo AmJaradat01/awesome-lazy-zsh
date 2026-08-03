@@ -30,6 +30,9 @@ Thumbs.db
 *.swo
 *~
 
+# Kiro development files
+.kiro/
+
 # Temporary files
 *.tmp
 *.temp
