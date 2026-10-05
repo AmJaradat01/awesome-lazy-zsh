@@ -35,10 +35,10 @@
     "url": "https://github.com/AmJaradat01/awesome-lazy-zsh/issues"
   },
   "devDependencies": {
-    "fast-check": "^4.9.0"
+    "fast-check": "^4.10.2"
   },
   "dependencies": {
-    "chalk": "^6.0.0",
+    "chalk": "^6.0.1",
     "prompts": "^2.4.2"
   }
 }
